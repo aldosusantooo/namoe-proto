@@ -3,21 +3,15 @@ import { copy } from "@/lib/copy";
 import { db } from "@/lib/db";
 import { requireOrganizer } from "@/lib/organizer";
 import { boothNumber } from "@/lib/booth-label";
+import { originFromHeaders } from "@/lib/request-origin";
 
 export const metadata = { title: copy.organizer.boothLinks };
 
-/** Absolute origin from the request, never from an env var, so links match whatever domain serves the app. */
-async function requestOrigin() {
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
-  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
-  return `${proto}://${host}`;
-}
 
 export default async function OrganizerBoothLinksPage({ params }: PageProps<"/organizer/[secret]/booth">) {
   const { secret } = await params;
   requireOrganizer(secret);
-  const origin = await requestOrigin();
+  const origin = originFromHeaders(await headers());
   const booths = await db.booth.findMany({ select: { code: true, qrToken: true, tenant: { select: { name: true } } } });
   booths.sort((a, b) => boothNumber(a.code) - boothNumber(b.code));
 

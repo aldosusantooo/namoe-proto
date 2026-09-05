@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { DEVICE_COOKIE, deviceCookieOptions, newDeviceId, readDeviceIdFromRequest } from "@/lib/device";
 import { getEvent } from "@/lib/event";
+import { originFromHeaders } from "@/lib/request-origin";
 import { stampBooth } from "@/lib/stamping";
 
 export const dynamic = "force-dynamic";
@@ -11,8 +12,9 @@ export async function GET(request: Request, ctx: RouteContext<"/b/[token]">) {
   const { token } = await ctx.params;
   const deviceId = readDeviceIdFromRequest(request) ?? newDeviceId();
 
+  const origin = originFromHeaders(request.headers);
   const redirect = (path: string) => {
-    const res = NextResponse.redirect(new URL(path, request.url), 303);
+    const res = NextResponse.redirect(new URL(path, origin), 303);
     // Set on the redirect too, so a first-ever scan stamps the device that lands on /paspor.
     res.cookies.set(DEVICE_COOKIE, deviceId, deviceCookieOptions());
     return res;
