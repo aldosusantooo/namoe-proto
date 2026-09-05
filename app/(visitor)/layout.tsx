@@ -1,3 +1,4 @@
+import { DeviceSync } from "@/components/DeviceSync";
 import { Nav } from "@/components/Nav";
 
 export default function VisitorLayout({ children }: { children: React.ReactNode }) {
@@ -7,6 +8,7 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
         {children}
       </main>
       <Nav />
+      <DeviceSync />
     </>
   );
 }

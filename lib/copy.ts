@@ -11,6 +11,9 @@ export const copy = {
     startPassport: "Mulai paspor",
     scheduleTitle: "Jadwal",
     tenantsCount: (n: number) => `${n} tenant`,
+    sessionsCount: (n: number) => `${n} sesi talkshow`,
+    mapHint: "Denah booth dan panggung",
+    noSessions: "Belum ada sesi di hari ini",
   },
   directory: {
     search: "Cari tenant",
@@ -31,7 +34,11 @@ export const copy = {
     tiktok: "TikTok",
     shop: "Toko online",
     notFound: "Tenant tidak ditemukan",
+    notFoundHint: "Tautan mungkin salah atau tenant sudah tidak terdaftar.",
+    backToDirectory: "Kembali ke daftar tenant",
     pinned: "Disematkan",
+    reply: "Jawaban tenant",
+    anon: "Anonim",
   },
   map: {
     title: "Peta booth",
