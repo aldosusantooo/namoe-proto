@@ -1,0 +1,168 @@
+/*
+  Namoe Market companion app (app name: Namoe Go)
+  Design tokens as CSS variables for Tailwind v4 (CSS-first config).
+  This file IS the token source of truth. Drop it in as the top of app/globals.css.
+  Derived from the product brief's visual direction and the @namoe.market posters.
+  No mockups existed when this was written; adjust hex values here only, never in components.
+*/
+
+@import "tailwindcss";
+
+@theme {
+  /* ---------- Type ---------- */
+  /* Fredoka: chunky rounded display, matches the wordmark. Nunito: rounded body. Loaded via next/font/google. */
+  --font-display: var(--font-fredoka), "Fredoka", ui-rounded, "Nunito", system-ui, sans-serif;
+  --font-sans: var(--font-nunito), "Nunito", ui-rounded, system-ui, -apple-system, sans-serif;
+
+  /* Mobile-first scale. Body 16 is the floor; the visitor is standing in a mall. */
+  --text-caption: 0.75rem;   --text-caption--line-height: 1rem;
+  --text-small: 0.875rem;    --text-small--line-height: 1.25rem;
+  --text-body: 1rem;         --text-body--line-height: 1.5rem;
+  --text-lead: 1.125rem;     --text-lead--line-height: 1.625rem;
+  --text-h3: 1.125rem;       --text-h3--line-height: 1.5rem;   --text-h3--font-weight: 600;
+  --text-h2: 1.25rem;        --text-h2--line-height: 1.625rem; --text-h2--font-weight: 600;
+  --text-h1: 1.5rem;         --text-h1--line-height: 1.875rem; --text-h1--font-weight: 600;
+  --text-display: 1.75rem;   --text-display--line-height: 2rem; --text-display--font-weight: 600;
+  --text-display-lg: 2.25rem; --text-display-lg--line-height: 2.5rem; --text-display-lg--font-weight: 600;
+
+  /* ---------- Neutrals (warm, never pure grey) ---------- */
+  --color-cream: #FFF6E6;        /* page ground */
+  --color-cream-deep: #F8E9CF;   /* pressed / alternate rows / stripe texture */
+  --color-paper: #FFFFFF;        /* cards */
+  --color-line: #EADDC4;         /* hairlines, card outline */
+  --color-line-strong: #D9C7A5;
+  --color-ink: #1E2A44;          /* body text */
+  --color-ink-soft: #4A5570;     /* secondary text */
+  --color-ink-muted: #7C849A;    /* placeholders, captions */
+  --color-navy: #2B5BA8;         /* poster headline blue; links, emphasis */
+
+  /* ---------- Brand hues (one per blob mascot) ---------- */
+  --color-blue: #4B7FD6;    --color-blue-soft: #DCE8F9;    /* blue triangle */
+  --color-sky: #8FC1EE;     --color-sky-soft: #E8F3FC;     /* wordmark light blue */
+  --color-coral: #E2574C;   --color-coral-soft: #FBE1DE;   /* red flower */
+  --color-green: #2BB673;   --color-green-soft: #D9F3E5;   /* green circle */
+  --color-yellow: #F5C445;  --color-yellow-soft: #FDF1CB;  /* stripe texture */
+  --color-pink: #F3A7C0;    --color-pink-soft: #FCE8EF;    /* pink pill */
+  --color-orange: #F7B15C;  --color-orange-soft: #FDECD6;  /* orange square */
+  --color-violet: #6E63D9;  --color-violet-soft: #E6E3F8;  /* poster "Electronics" chip */
+  --color-teal: #3AAFA9;    --color-teal-soft: #DCF2F1;    /* added for 10 distinct categories */
+
+  /* ---------- Radii: chunky and rounded, like the posters ---------- */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+
+  /* ---------- Elevation: a warm offset edge instead of grey blur ---------- */
+  --shadow-card: 0 2px 0 0 var(--color-line), 0 10px 24px -14px rgba(30, 42, 68, 0.22);
+  --shadow-card-raised: 0 3px 0 0 var(--color-line-strong), 0 16px 32px -16px rgba(30, 42, 68, 0.28);
+  --shadow-sticker: 0 3px 0 0 var(--color-navy);
+
+  /* ---------- Motion ---------- */
+  --ease-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+}
+
+/* Semantic aliases. `inline` so utilities like bg-primary resolve to the hex at build time. */
+@theme inline {
+  --color-bg: var(--color-cream);
+  --color-surface: var(--color-paper);
+  --color-surface-alt: var(--color-cream-deep);
+  --color-fg: var(--color-ink);
+  --color-fg-soft: var(--color-ink-soft);
+  --color-fg-muted: var(--color-ink-muted);
+  --color-border: var(--color-line);
+  --color-primary: var(--color-blue);
+  --color-primary-soft: var(--color-blue-soft);
+  --color-on-primary: #FFFFFF;
+  --color-accent: var(--color-coral);
+  --color-accent-soft: var(--color-coral-soft);
+  --color-success: var(--color-green);
+  --color-success-soft: var(--color-green-soft);
+  --color-warning: var(--color-yellow);
+  --color-warning-soft: var(--color-yellow-soft);
+  --color-danger: var(--color-coral);
+  --color-link: var(--color-navy);
+
+  /* Category colours. Slugs match the Category enum in Prisma (lowercase, hyphenated).
+     Used by directory chips, tenant badges and floor map booth fills. */
+  --color-cat-pakaian-ibu-anak: var(--color-blue);
+  --color-cat-aksesori-anak: var(--color-green);
+  --color-cat-perlengkapan-rumah: var(--color-sky);
+  --color-cat-dekorasi-rumah: var(--color-teal);
+  --color-cat-mainan-hobi: var(--color-pink);
+  --color-cat-elektronik: var(--color-violet);
+  --color-cat-perlengkapan-ibu: var(--color-coral);
+  --color-cat-peralatan-dapur: var(--color-yellow);
+  --color-cat-edukasi: var(--color-navy);
+  --color-cat-makanan-minuman: var(--color-orange);
+
+  --color-cat-pakaian-ibu-anak-soft: var(--color-blue-soft);
+  --color-cat-aksesori-anak-soft: var(--color-green-soft);
+  --color-cat-perlengkapan-rumah-soft: var(--color-sky-soft);
+  --color-cat-dekorasi-rumah-soft: var(--color-teal-soft);
+  --color-cat-mainan-hobi-soft: var(--color-pink-soft);
+  --color-cat-elektronik-soft: var(--color-violet-soft);
+  --color-cat-perlengkapan-ibu-soft: var(--color-coral-soft);
+  --color-cat-peralatan-dapur-soft: var(--color-yellow-soft);
+  --color-cat-edukasi-soft: var(--color-blue-soft);
+  --color-cat-makanan-minuman-soft: var(--color-orange-soft);
+}
+
+/* Plain custom properties (not utility namespaces). Read them with var() in components and the SVG map. */
+:root {
+  --tap-min: 44px;                 /* minimum hit target, every button and booth */
+  --page-gutter: 16px;             /* mobile side padding */
+  --page-max: 640px;               /* visitor pages never go wider than this */
+  --dashboard-max: 1200px;         /* organizer pages, desktop */
+  --nav-height: 64px;              /* bottom tab bar */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* Floor map */
+  --map-booth-empty: var(--color-paper);
+  --map-booth-empty-stroke: var(--color-line-strong);
+  --map-booth-text: #FFFFFF;
+  --map-booth-text-empty: var(--color-ink-muted);
+  --map-fixture: var(--color-cream-deep);     /* mall tenants, lobbies */
+  --map-fixture-text: var(--color-ink-soft);
+  --map-stage: var(--color-navy);
+  --map-seating: var(--color-ink-soft);
+  --map-highlight: var(--color-ink);         /* selected booth stroke */
+  --map-dim-opacity: 0.22;                   /* booths outside the active category filter */
+
+  /* Passport */
+  --stamp-size: 72px;
+  --stamp-empty: var(--color-cream-deep);
+  --stamp-empty-stroke: var(--color-line-strong);
+}
+
+/* Base */
+html { color-scheme: light; }
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.01em; }
+
+/* One texture per screen at most. Apply to a wrapper, never to body. */
+.texture-grid {
+  background-image:
+    linear-gradient(to right, rgba(30, 42, 68, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(30, 42, 68, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.texture-stripes {
+  background-image: repeating-linear-gradient(90deg, var(--color-yellow-soft) 0 18px, transparent 18px 36px);
+}
+.panel-wavy {
+  /* wavy-edged cream panel like the "This is your sign" poster */
+  border-radius: var(--radius-xl);
+  background: var(--color-cream);
+  mask: radial-gradient(14px at 14px 50%, transparent 98%, #000) -14px 0 / 100% 28px repeat-y;
+}
