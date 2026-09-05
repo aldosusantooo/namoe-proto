@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Category {
+  PAKAIAN_IBU_ANAK // Pakaian ibu dan anak
+  AKSESORI_ANAK // Aksesori anak
+  PERLENGKAPAN_RUMAH // Perlengkapan rumah
+  DEKORASI_RUMAH // Dekorasi rumah
+  MAINAN_HOBI // Mainan dan hobi
+  ELEKTRONIK // Elektronik
+  PERLENGKAPAN_IBU // Perlengkapan ibu hamil dan menyusui
+  PERALATAN_DAPUR // Peralatan dapur
+  EDUKASI // Edukasi
+  MAKANAN_MINUMAN // Makanan dan minuman
+}
+
+enum Zone {
+  A
+  FNB
+}
+
+enum QuestionKind {
+  QUESTION
+  THANKS
+}
+
+model Event {
+  id             Int      @id @default(1)
+  name           String // "Namoe Market"
+  tagline        String // "A home for every family"
+  venue          String // "Main Atrium, PIK Avenue Mall"
+  startsOn       DateTime // 2026-10-22 10:00 WIB
+  endsOn         DateTime // 2026-10-25 22:00 WIB
+  passportTarget Int      @default(5)
+  prizeCopy      String // placeholder Theo fills in
+}
+
+model Tenant {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  name        String
+  category    Category
+  intro       String
+  promo       String?
+  photos      String[] // up to 5 URLs
+  logoUrl     String?
+  instagram   String? // handle without @
+  tiktok      String?
+  marketplace String? // Shopee or Tokopedia URL
+  color       String? // brand hex, optional
+  editToken   String       @unique // magic link token, used in P1
+  viewCount   Int          @default(0)
+  booths      Booth[]
+  slots       TenantSlot[]
+  posts       TenantPost[]
+  feedPosts   FeedPost[]
+  createdAt   DateTime     @default(now())
+}
+
+model TenantSlot {
+  // "Di booth ini"
+  id       String  @id @default(cuid())
+  tenantId String
+  tenant   Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  label    String // "Demo gendongan hip seat dan carrier"
+  time     String? // "14.00", null = sepanjang hari
+  day      Int? // 1..4, null = setiap hari
+  order    Int     @default(0)
+}
+
+model Booth {
+  code     String  @id // "A12"
+  zone     Zone
+  band     Int // 1..3 for A, 0 for FNB
+  cluster  Int // index within band
+  x        Int
+  y        Int
+  w        Int
+  h        Int
+  qrToken  String  @unique
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  stamps   Stamp[]
+}
+
+model Speaker {
+  id       String           @id @default(cuid())
+  slug     String           @unique
+  name     String
+  handle   String?
+  bio      String
+  photoUrl String?
+  sessions SessionSpeaker[]
+}
+
+model Session {
+  id          String           @id @default(cuid())
+  slug        String           @unique // "kamis-1300"
+  title       String
+  description String?
+  day         Int // 1..4
+  startsAt    DateTime
+  endsAt      DateTime
+  stage       String           @default("Panggung utama")
+  speakers    SessionSpeaker[]
+  questions   Question[]
+}
+
+model SessionSpeaker {
+  sessionId String
+  speakerId String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  speaker   Speaker @relation(fields: [speakerId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, speakerId])
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  sessionId   String
+  session     Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  kind        QuestionKind @default(QUESTION)
+  body        String
+  displayName String? // null = anonim
+  deviceId    String
+  upvoteCount Int          @default(0) // denormalised, updated in the same transaction as Upvote
+  answered    Boolean      @default(false)
+  answeredAt  DateTime?
+  hidden      Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  upvotes     Upvote[]
+
+  @@index([sessionId, kind, hidden])
+}
+
+model Upvote {
+  questionId String
+  deviceId   String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@id([questionId, deviceId])
+}
+
+model TenantPost {
+  // Tanya tenant (P1 posting, model exists day one)
+  id          String    @id @default(cuid())
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  body        String
+  displayName String?
+  deviceId    String
+  reply       String?
+  repliedAt   DateTime?
+  pinned      Boolean   @default(false)
+  hidden      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
+
+model FeedPost {
+  // P1 screen, seeded day one
+  id             String   @id @default(cuid())
+  body           String
+  photoUrl       String?
+  authorTenantId String?
+  authorTenant   Tenant?  @relation(fields: [authorTenantId], references: [id], onDelete: SetNull)
+  displayName    String?
+  deviceId       String?
+  hidden         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}
+
+model Passport {
+  id          String    @id @default(cuid())
+  deviceId    String    @unique
+  redeemCode  String?   @unique
+  completedAt DateTime?
+  redeemedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  stamps      Stamp[]
+}
+
+model Stamp {
+  passportId String
+  boothCode  String
+  passport   Passport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  booth      Booth    @relation(fields: [boothCode], references: [code], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@id([passportId, boothCode])
+}
