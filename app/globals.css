@@ -8,7 +8,9 @@
 
 @import "tailwindcss";
 
-@theme {
+/* `static` so every token is emitted as a CSS variable even when no utility uses it: the SVG map and
+   category badges read them through var() at runtime. */
+@theme static {
   /* ---------- Type ---------- */
   /* Fredoka: chunky rounded display, matches the wordmark. Nunito: rounded body. Loaded via next/font/google. */
   --font-display: var(--font-fredoka), "Fredoka", ui-rounded, "Nunito", system-ui, sans-serif;
@@ -67,7 +69,7 @@
 }
 
 /* Semantic aliases. `inline` so utilities like bg-primary resolve to the hex at build time. */
-@theme inline {
+@theme inline static {
   --color-bg: var(--color-cream);
   --color-surface: var(--color-paper);
   --color-surface-alt: var(--color-cream-deep);

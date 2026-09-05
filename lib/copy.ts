@@ -51,6 +51,8 @@ export const copy = {
     gate: "Gerbang",
     openTenant: "Buka halaman tenant",
     legend: "Kategori",
+    close: "Tutup",
+    unit: (n: number) => `${n} unit booth`,
   },
   qa: {
     tabQuestions: "Tanya pembicara",
@@ -64,6 +66,11 @@ export const copy = {
     answeredCount: (n: number) => `${n} pertanyaan sudah dijawab`,
     emptyQuestions: "Belum ada pertanyaan. Jadi yang pertama bertanya.",
     emptyThanks: "Belum ada ucapan. Tulis ucapan pertama untuk pembicara.",
+    counter: (n: number, max: number) => `${n} dari ${max} karakter`,
+    upvote: "Dukung pertanyaan ini",
+    sessionNotFound: "Sesi tidak ditemukan",
+    backToSchedule: "Kembali ke jadwal",
+    speakers: "Pembicara",
   },
   passport: {
     title: "Paspor booth",

@@ -3,9 +3,11 @@ import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { Card } from "@/components/Card";
 import { CategoryBadge } from "@/components/CategoryBadge";
+import { MiniMap } from "@/components/MiniMap";
 import { boothLabel, primaryCode } from "@/lib/booth-label";
 import { copy } from "@/lib/copy";
 import { db } from "@/lib/db";
+import { loadMapBooths } from "@/lib/map-data";
 import { formatDay } from "@/lib/time";
 
 export async function generateMetadata({ params }: PageProps<"/tenant/[slug]">) {
@@ -25,6 +27,7 @@ export default async function TenantPage({ params }: PageProps<"/tenant/[slug]">
     },
   });
   if (!tenant) notFound();
+  const mapBooths = await loadMapBooths();
 
   after(async () => {
     await db.tenant.update({ where: { id: tenant.id }, data: { viewCount: { increment: 1 } } });
@@ -73,7 +76,7 @@ export default async function TenantPage({ params }: PageProps<"/tenant/[slug]">
 
       {codes.length ? (
         <Card as="section" className="flex flex-col gap-3">
-          <div id="minimap-slot" className="aspect-[1200/680] w-full rounded-md bg-surface-alt" />
+          <MiniMap booths={mapBooths} codes={codes} title={copy.tenant.booth(boothLabel(codes))} />
           <div className="flex items-center justify-between gap-3">
             <p className="font-display text-h2 text-fg">{copy.tenant.booth(boothLabel(codes))}</p>
             <Link href={`/peta?booth=${primary}`} className="flex min-h-[var(--tap-min)] items-center text-small font-bold text-link">
