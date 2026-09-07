@@ -1,6 +1,10 @@
 import { DeviceSync } from "@/components/DeviceSync";
 import { Nav } from "@/components/Nav";
 
+// Every page here reads the database. Render at request time so `next build` never needs a database connection
+// (Railway builds cannot reach the private Postgres network).
+export const dynamic = "force-dynamic";
+
 export default function VisitorLayout({ children }: { children: React.ReactNode }) {
   return (
     <>

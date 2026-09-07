@@ -2,6 +2,10 @@ import Link from "next/link";
 import { copy } from "@/lib/copy";
 import { requireOrganizer } from "@/lib/organizer";
 
+// Every page here reads the database. Render at request time so `next build` never needs a database connection
+// (Railway builds cannot reach the private Postgres network).
+export const dynamic = "force-dynamic";
+
 export default async function OrganizerLayout({ children, params }: LayoutProps<"/organizer/[secret]">) {
   const { secret } = await params;
   requireOrganizer(secret);
