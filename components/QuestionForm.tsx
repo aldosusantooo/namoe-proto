@@ -130,9 +130,7 @@ export function QuestionForm({ action, fields, placeholder, trigger = "bar", but
       ) : null}
       <div className="flex items-center gap-2 px-3 py-2.5" style={{ minHeight: "var(--compose-height)" }}>
         {hidden}
-        {open ? (
-          <span className="flex-1 text-small text-ink-soft">{copy.qa.name.split(",")[0] === "Nama" ? "" : ""}</span>
-        ) : (
+        {open ? null : (
           <button
             type="button"
             onClick={() => setOpen(true)}
@@ -141,7 +139,7 @@ export function QuestionForm({ action, fields, placeholder, trigger = "bar", but
             {placeholder}
           </button>
         )}
-        <Button type="submit" variant="primary" disabled={pending || !open} className={open ? "flex-1" : ""}>
+        <Button type="submit" variant="primary" disabled={pending || !open} block={open}>
           {copy.qa.send}
         </Button>
       </div>
