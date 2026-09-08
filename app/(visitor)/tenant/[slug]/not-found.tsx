@@ -1,15 +1,16 @@
-import Link from "next/link";
+import { Button } from "@/components/Button";
 import { Empty } from "@/components/Empty";
+import { PageHeader } from "@/components/PageHeader";
 import { copy } from "@/lib/copy";
 
 export default function TenantNotFound() {
   return (
-    <div className="flex flex-col gap-4 pt-8">
-      <h1 className="font-display text-display text-fg">{copy.tenant.notFound}</h1>
+    <div className="flex flex-col gap-4">
+      <PageHeader title={copy.tenant.notFound} back="/tenant" />
       <Empty kind="search" title={copy.tenant.notFound} body={copy.tenant.notFoundHint} />
-      <Link href="/tenant" className="inline-flex min-h-[var(--tap-min)] items-center font-bold text-link">
+      <Button href="/tenant" variant="ghost">
         {copy.tenant.backToDirectory}
-      </Link>
+      </Button>
     </div>
   );
 }

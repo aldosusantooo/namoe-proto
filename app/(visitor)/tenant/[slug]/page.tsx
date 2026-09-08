@@ -1,15 +1,26 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
+import { BackButton } from "@/components/BackButton";
+import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
+import { BoothPill, CategoryBadge } from "@/components/CategoryBadge";
+import { LinkChip } from "@/components/Chip";
 import { Empty } from "@/components/Empty";
-import { CategoryBadge } from "@/components/CategoryBadge";
+import { IconGift, IconInstagram, IconMarketplace, IconPin, IconTiktok } from "@/components/icons/UiIcons";
 import { MiniMap } from "@/components/MiniMap";
-import { boothLabel, primaryCode } from "@/lib/booth-label";
+import { Eyebrow, SectionHeader } from "@/components/PageHeader";
+import { PhotoStrip } from "@/components/PhotoStrip";
+import { PlaceholderArt } from "@/components/PlaceholderArt";
+import { RowCard, SchedRow } from "@/components/ScheduleList";
+import { TenantBoard } from "@/components/TenantBoard";
+import { boothLabel, primaryCode, sortCodes } from "@/lib/booth-label";
+import { locationHint } from "@/lib/booth-location";
+import { catVar } from "@/lib/categories";
 import { copy } from "@/lib/copy";
 import { db } from "@/lib/db";
 import { loadMapBooths } from "@/lib/map-data";
-import { formatDay } from "@/lib/time";
+import { marketplaceLabel, socialUrl } from "@/lib/social";
+import { DAY_LABELS, type EventDay } from "@/lib/time";
 
 export async function generateMetadata({ params }: PageProps<"/tenant/[slug]">) {
   const { slug } = await params;
@@ -34,116 +45,112 @@ export default async function TenantPage({ params }: PageProps<"/tenant/[slug]">
     await db.tenant.update({ where: { id: tenant.id }, data: { viewCount: { increment: 1 } } });
   });
 
-  const codes = tenant.booths.map((b) => b.code);
+  const codes = sortCodes(tenant.booths.map((b) => b.code));
   const primary = primaryCode(codes);
-  const socials: { label: string; href: string }[] = [];
-  if (tenant.instagram) socials.push({ label: copy.tenant.instagram, href: `https://instagram.com/${tenant.instagram}` });
-  if (tenant.tiktok) socials.push({ label: copy.tenant.tiktok, href: `https://www.tiktok.com/@${tenant.tiktok}` });
-  if (tenant.marketplace) socials.push({ label: copy.tenant.shop, href: tenant.marketplace });
+  const firstBooth = mapBooths.find((b) => b.code === primary);
+  const promoVisible = Boolean(tenant.promo) && tenant.promoVisible;
+
+  const links: { href: string; label: string; icon: React.ReactNode }[] = [];
+  if (tenant.instagram) links.push({ href: socialUrl("instagram", tenant.instagram), label: copy.tenant.instagram, icon: <IconInstagram size={22} /> });
+  if (tenant.tiktok) links.push({ href: socialUrl("tiktok", tenant.tiktok), label: copy.tenant.tiktok, icon: <IconTiktok size={22} /> });
+  if (tenant.marketplace) links.push({ href: tenant.marketplace, label: marketplaceLabel(tenant.marketplace), icon: <IconMarketplace size={22} /> });
 
   return (
-    <article className="flex flex-col gap-6 pt-6">
-      <header className="flex items-center gap-4">
-        <img
-          src={tenant.logoUrl ?? `/img/${tenant.slug}?logo=1`}
-          alt=""
-          loading="lazy"
-          className="size-16 shrink-0 rounded-full bg-surface-alt object-cover"
-        />
-        <div className="flex flex-col gap-1.5">
-          <h1 className="font-display text-display leading-tight text-fg">{tenant.name}</h1>
-          <CategoryBadge category={tenant.category} className="self-start" />
+    <article className="flex flex-col gap-4">
+      <div className="relative -mx-[var(--page-gutter)] -mt-4">
+        <div className="edge-wavy-bottom h-[var(--hero-art-height)] overflow-hidden">
+          {tenant.logoUrl ? (
+            <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <PlaceholderArt name={tenant.name} category={tenant.category} variant="hero" />
+          )}
         </div>
-      </header>
+        <BackButton fallback="/tenant" className="absolute left-3 top-3" />
+      </div>
 
-      {tenant.photos.length ? (
-        <ul className="-mx-[var(--page-gutter)] flex snap-x snap-mandatory gap-3 overflow-x-auto px-[var(--page-gutter)] [scrollbar-width:none]">
-          {tenant.photos.slice(0, 5).map((src, i) => (
-            <li key={src} className="w-[72%] shrink-0 snap-start">
-              <img src={src} alt={`${tenant.name} ${i + 1}`} loading="lazy" className="aspect-square w-full rounded-lg bg-surface-alt object-cover" />
-            </li>
-          ))}
-        </ul>
+      <div className="-mt-1.5 flex flex-col gap-2.5">
+        <header className="flex min-h-12 items-center gap-2.5">
+          <h1 className="min-w-0 flex-1 font-display text-h1 text-ink">{tenant.name}</h1>
+          {codes.length ? (
+            <BoothPill>
+              <IconPin size={16} />
+              {codes.join(", ")}
+            </BoothPill>
+          ) : null}
+        </header>
+        <div>
+          <CategoryBadge category={tenant.category} />
+        </div>
+      </div>
+
+      <PhotoStrip photos={tenant.photos} name={tenant.name} />
+
+      <p className="text-body text-ink">{tenant.intro}</p>
+
+      {promoVisible ? (
+        <section className="flex items-center gap-3 rounded-lg bg-yellow px-4 py-3.5 text-ink">
+          <IconGift size={30} className="shrink-0" />
+          <div>
+            <Eyebrow tone="ink">{copy.tenant.promo}</Eyebrow>
+            <p className="font-display text-h3">{tenant.promo}</p>
+          </div>
+        </section>
       ) : null}
 
-      <p className="text-lead text-fg">{tenant.intro}</p>
-
-      {tenant.promo ? (
-        <Card as="section" className="bg-accent-soft shadow-none">
-          <h2 className="text-caption font-bold uppercase tracking-wide text-accent">{copy.tenant.promo}</h2>
-          <p className="mt-1 font-display text-h2 text-fg">{tenant.promo}</p>
-        </Card>
-      ) : null}
-
-      {codes.length ? (
-        <Card as="section" className="flex flex-col gap-3">
-          <MiniMap booths={mapBooths} codes={codes} title={copy.tenant.booth(boothLabel(codes))} />
-          <div className="flex items-center justify-between gap-3">
-            <p className="font-display text-h2 text-fg">{copy.tenant.booth(boothLabel(codes))}</p>
-            <Link href={`/peta?booth=${primary}`} className="flex min-h-[var(--tap-min)] items-center text-small font-bold text-link">
+      {codes.length && primary ? (
+        <Card as="section">
+          <MiniMap booths={mapBooths} codes={codes} title={copy.tenant.boothLine(boothLabel(codes))} />
+          <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <div className="min-w-0">
+              <p className="text-body font-extrabold text-ink">{copy.tenant.boothLine(boothLabel(codes))}</p>
+              {firstBooth ? <p className="text-small text-ink-soft">{locationHint(firstBooth)}</p> : null}
+            </div>
+            <Button href={`/peta?booth=${primary}`} variant="ghost" sm>
               {copy.tenant.openMap}
-            </Link>
+            </Button>
           </div>
         </Card>
       ) : null}
 
       {tenant.slots.length ? (
-        <section className="flex flex-col gap-2">
-          <h2 className="font-display text-h1 text-fg">{copy.tenant.atBooth}</h2>
-          <ul className="divide-y divide-border overflow-hidden rounded-lg bg-surface shadow-card">
+        <section className="flex flex-col gap-2.5">
+          <SectionHeader title={copy.tenant.atBooth} />
+          <RowCard>
             {tenant.slots.map((s) => (
-              <li key={s.id} className="flex items-baseline gap-4 px-4 py-3">
-                <span className="w-24 shrink-0 font-display text-h3 text-navy">{s.time ?? copy.tenant.allDay}</span>
-                <span className="text-body text-fg">{s.label}</span>
-              </li>
+              <SchedRow
+                key={s.id}
+                lead={s.time ?? copy.tenant.allDay}
+                leadClassName={s.time ? "" : "text-[16px]"}
+                title={s.label}
+                sub={s.day ? DAY_LABELS[(s.day as EventDay) - 1] : copy.tenant.everyDay}
+              />
             ))}
-          </ul>
+          </RowCard>
         </section>
       ) : null}
 
-      {socials.length ? (
+      {links.length ? (
         <ul className="flex flex-wrap gap-2">
-          {socials.map((s) => (
-            <li key={s.href}>
-              <a
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-[var(--tap-min)] items-center rounded-pill border border-border bg-surface px-4 text-small font-bold text-fg"
-              >
-                {s.label}
-              </a>
+          {links.map((l) => (
+            <li key={l.href}>
+              <LinkChip href={l.href} icon={l.icon}>
+                {l.label}
+              </LinkChip>
             </li>
           ))}
         </ul>
       ) : null}
 
-      <section className="flex flex-col gap-3">
-        <h2 className="font-display text-h1 text-fg">{copy.tenant.ask}</h2>
+      <section className="flex flex-col gap-2.5">
+        <SectionHeader title={copy.tenant.ask} />
         {tenant.posts.length ? (
-          <ul className="flex flex-col gap-3">
-            {tenant.posts.map((p) => (
-              <li key={p.id}>
-                <Card>
-                  {p.pinned ? (
-                    <p className="mb-1 text-caption font-bold uppercase tracking-wide text-primary">{copy.tenant.pinned}</p>
-                  ) : null}
-                  <p className="text-body text-fg">{p.body}</p>
-                  <p className="mt-1 text-caption text-fg-muted">
-                    {p.displayName ?? copy.tenant.anon}, {formatDay(p.createdAt)}
-                  </p>
-                  {p.reply ? (
-                    <div className="mt-3 rounded-md bg-primary-soft p-3">
-                      <p className="text-caption font-bold text-navy">{copy.tenant.reply}</p>
-                      <p className="mt-0.5 text-body text-fg">{p.reply}</p>
-                    </div>
-                  ) : null}
-                </Card>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        {tenant.posts.length ? null : <Empty kind="questions" title={copy.tenant.askEmptyTitle} body={copy.tenant.askEmptyBody} />}
+          <TenantBoard posts={tenant.posts} accent={catVar(tenant.category)} />
+        ) : (
+          <Empty kind="questions" title={copy.tenant.askEmptyTitle} body={copy.tenant.askEmptyBody} />
+        )}
+        <Button variant="primary" block disabled>
+          {copy.tenant.askWrite}
+        </Button>
       </section>
     </article>
   );

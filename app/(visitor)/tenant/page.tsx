@@ -1,8 +1,7 @@
-import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { CategoryChips } from "@/components/CategoryChips";
+import { DirectoryHeader } from "@/components/DirectoryHeader";
 import { Empty } from "@/components/Empty";
-import { SearchBox } from "@/components/SearchBox";
 import { TenantCard } from "@/components/TenantCard";
 import { bySlug } from "@/lib/categories";
 import { copy } from "@/lib/copy";
@@ -19,10 +18,17 @@ export default async function TenantDirectoryPage({ searchParams }: PageProps<"/
   const category = bySlug(first(params.kategori));
   const q = (first(params.q) ?? "").trim();
 
+  // Name, intro, or a booth code ("A37" or "a3" as a prefix).
   const where: Prisma.TenantWhereInput = {
     ...(category ? { category: category.key } : {}),
     ...(q
-      ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { intro: { contains: q, mode: "insensitive" } }] }
+      ? {
+          OR: [
+            { name: { contains: q, mode: "insensitive" } },
+            { intro: { contains: q, mode: "insensitive" } },
+            { booths: { some: { code: { startsWith: q.toUpperCase() } } } },
+          ],
+        }
       : {}),
   };
 
@@ -36,18 +42,9 @@ export default async function TenantDirectoryPage({ searchParams }: PageProps<"/
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="sticky top-0 z-30 -mx-[var(--page-gutter)] flex flex-col gap-3 bg-bg px-[var(--page-gutter)] pb-3 pt-4">
-        <div className="flex items-center justify-between">
-          <h1 className="font-display text-display text-fg">{copy.nav.tenants}</h1>
-          <Link href={mapHref} className="flex min-h-[var(--tap-min)] items-center text-small font-bold text-link">
-            {copy.tenant.openMap}
-          </Link>
-        </div>
-        <SearchBox basePath="/tenant" />
-        <CategoryChips basePath="/tenant" active={category} extraParams={{ q }} />
-      </div>
-
-      <p className="text-small text-fg-muted">{copy.directory.count(tenants.length)}</p>
+      <DirectoryHeader mapHref={mapHref} initialOpen={q.length > 0} />
+      <CategoryChips basePath="/tenant" active={category} extraParams={{ q }} />
+      <p className="-mt-1 text-small text-ink-soft">{category ? copy.directory.countIn(tenants.length, category.label) : copy.directory.count(tenants.length)}</p>
 
       {tenants.length ? (
         <ul className="grid grid-cols-2 gap-3">

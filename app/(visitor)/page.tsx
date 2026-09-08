@@ -1,86 +1,98 @@
-import Link from "next/link";
+import { Avatar } from "@/components/Avatar";
+import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
-import { DayTabs } from "@/components/DayTabs";
 import { Empty } from "@/components/Empty";
-import { ScheduleList, speakerNames } from "@/components/ScheduleList";
+import { MascotBiru, MascotMerah, MascotOranye } from "@/components/icons/Mascots";
+import { Lockup } from "@/components/Lockup";
+import { Eyebrow, SectionHeader } from "@/components/PageHeader";
+import { ScheduleList } from "@/components/ScheduleList";
+import { Tile } from "@/components/Tile";
 import { copy } from "@/lib/copy";
 import { db } from "@/lib/db";
 import { getOrCreateDeviceId } from "@/lib/device-server";
 import { getEvent } from "@/lib/event";
-import { parseDay, sessionsForDay } from "@/lib/schedule";
-import { dayLabel, formatTimeRange } from "@/lib/time";
+import { speakerHandle } from "@/lib/speaker";
+import { DAY_LABELS, formatTime, type EventDay } from "@/lib/time";
 
-export default async function HomePage({ searchParams }: PageProps<"/">) {
-  const params = await searchParams;
-  const day = parseDay(params.hari);
+export default async function HomePage() {
   const deviceId = await getOrCreateDeviceId();
 
   const [event, sessions, tenantCount, passport] = await Promise.all([
     getEvent(),
-    db.session.findMany({ include: { speakers: { include: { speaker: { select: { name: true } } } } } }),
+    db.session.findMany({
+      orderBy: [{ day: "asc" }, { startsAt: "asc" }],
+      include: { speakers: { include: { speaker: { select: { name: true, handle: true, photoUrl: true } } } } },
+    }),
     db.tenant.count(),
-    db.passport.findUnique({ where: { deviceId }, select: { _count: { select: { stamps: true } } } }),
+    db.passport.findUnique({ where: { deviceId }, select: { completedAt: true, _count: { select: { stamps: true } } } }),
   ]);
 
-  const today = sessionsForDay(sessions, day);
-  const headline = today[0];
+  const [headline, ...rest] = sessions;
+  const next = rest.slice(0, 3);
   const stamps = passport?._count.stamps ?? 0;
-
-  const tiles = [
-    { href: "/tenant", label: copy.nav.tenants, sub: copy.home.tenantsCount(tenantCount), bg: "var(--color-blue-soft)" },
-    { href: "/peta", label: copy.nav.map, sub: copy.home.mapHint, bg: "var(--color-green-soft)" },
-    {
-      href: "/paspor",
-      label: copy.nav.passport,
-      sub: passport ? copy.passport.progress(stamps, event.passportTarget) : copy.passport.progress(0, event.passportTarget),
-      bg: "var(--color-coral-soft)",
-    },
-    { href: "/jadwal", label: copy.nav.schedule, sub: copy.home.sessionsCount(sessions.length), bg: "var(--color-yellow-soft)" },
-  ];
+  const passportSub = passport && stamps >= event.passportTarget ? copy.home.passportComplete : copy.home.passportProgress(stamps, event.passportTarget);
+  const speaker = headline?.speakers[0]?.speaker;
 
   return (
-    <div className="flex flex-col gap-6">
-      <header className="pt-8">
-        <h1 className="font-display text-display-lg text-navy">{event.name}</h1>
-        <p className="mt-1 text-small font-semibold uppercase tracking-wide text-fg-muted">{event.tagline}</p>
-        <p className="mt-3 text-body text-fg">{copy.home.dates}</p>
-        <p className="text-body text-fg-soft">{event.venue}</p>
+    <div className="flex flex-col gap-4">
+      <header className="texture-check edge-wavy-bottom relative -mx-[var(--page-gutter)] -mt-4 bg-blue px-5 pb-[46px] pt-[22px] text-paper">
+        <div aria-hidden="true" className="absolute right-3.5 top-3.5 flex gap-1.5">
+          <MascotBiru size={44} />
+          <MascotMerah size={44} />
+          <MascotOranye size={44} />
+        </div>
+        <h1>
+          <Lockup />
+          <span className="mt-1.5 block font-display text-body font-semibold text-paper/95">{copy.home.subtitle}</span>
+        </h1>
+        <p className="mt-[18px] font-display text-lead font-semibold leading-[1.3]">{copy.home.dates}</p>
+        <p className="text-[15px] opacity-90">{event.venue}</p>
       </header>
 
       {headline ? (
-        <Card as="section" className="border-t-4 border-primary">
-          <p className="text-caption font-bold uppercase tracking-wide text-primary">{dayLabel(day)}</p>
-          <h2 className="mt-1 font-display text-h1 text-fg">{headline.title}</h2>
-          <p className="mt-1 text-body text-fg-soft">{speakerNames(headline)}</p>
-          <p className="mt-1 font-display text-lead text-navy">{formatTimeRange(headline.startsAt, headline.endsAt)}</p>
-          {headline.description ? <p className="mt-3 text-body text-fg-soft">{headline.description}</p> : null}
-          <Link
-            href={`/sesi/${headline.slug}`}
-            className="mt-4 inline-flex min-h-[var(--tap-min)] items-center justify-center rounded-pill bg-primary px-5 font-bold text-on-primary"
-          >
-            {copy.home.askSpeaker}
-          </Link>
+        <Card as="section">
+          <div className="flex items-center justify-between gap-3 bg-yellow px-4 py-2">
+            <Eyebrow tone="ink">{copy.home.openingTalk}</Eyebrow>
+            <span className="text-small font-extrabold text-ink">
+              {DAY_LABELS[(headline.day as EventDay) - 1]}, {formatTime(headline.startsAt)}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2.5 px-4 pb-4 pt-3.5">
+            <h2 className="font-display text-h2 text-ink">{headline.title}</h2>
+            {speaker ? (
+              <div className="flex items-center gap-3">
+                <Avatar name={speaker.name} photoUrl={speaker.photoUrl} size={40} />
+                <div className="min-w-0">
+                  <p className="font-bold text-ink">{speaker.name}</p>
+                  <p className="text-small text-ink-soft">{speakerHandle(speaker)}</p>
+                </div>
+              </div>
+            ) : null}
+            {headline.description ? <p className="text-body text-ink-soft">{headline.description}</p> : null}
+            <Button href={`/sesi/${headline.slug}`} variant="primary" block>
+              {copy.home.askSpeaker}
+            </Button>
+          </div>
         </Card>
       ) : null}
 
-      <section className="grid grid-cols-2 gap-3">
-        {tiles.map((t) => (
-          <Link
-            key={t.href}
-            href={t.href}
-            className="flex min-h-24 flex-col justify-between rounded-lg p-4 shadow-card transition-transform duration-[var(--duration-fast)] active:scale-[0.98]"
-            style={{ background: t.bg }}
-          >
-            <span className="font-display text-h2 text-fg">{t.label}</span>
-            <span className="text-small text-fg-soft">{t.sub}</span>
-          </Link>
-        ))}
-      </section>
+      <nav aria-label="Bagian aplikasi" className="grid grid-cols-2 gap-3">
+        <Tile href="/tenant" tone="blue" icon="tenant" title={copy.nav.tenants} subtitle={copy.home.tenantsCount(tenantCount)} />
+        <Tile href="/peta" tone="green" icon="peta" title={copy.nav.map} subtitle={copy.home.mapHint} />
+        <Tile href="/jadwal" tone="yellow" icon="jadwal" title={copy.nav.schedule} subtitle={copy.home.sessionsCount(sessions.length)} />
+        <Tile href="/paspor" tone="coral" icon="paspor" title={copy.nav.passport} subtitle={passportSub} />
+      </nav>
 
-      <section id="jadwal" className="flex flex-col gap-3">
-        <h2 className="font-display text-h1 text-fg">{copy.nav.schedule}</h2>
-        <DayTabs basePath="/" active={day} anchor="jadwal" />
-        {today.length ? <ScheduleList sessions={today} /> : <Empty kind="search" title={copy.home.noSessions} />}
+      <section className="flex flex-col gap-2.5">
+        <SectionHeader
+          title={copy.home.nextTalks}
+          action={
+            <>
+              <Eyebrow href="/jadwal">{copy.home.allSchedule}</Eyebrow>
+            </>
+          }
+        />
+        {next.length ? <ScheduleList sessions={next} relativeToDay={(headline?.day ?? 1) as EventDay} /> : <Empty kind="search" title={copy.home.noSessions} />}
       </section>
     </div>
   );

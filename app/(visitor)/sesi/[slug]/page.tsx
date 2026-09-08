@@ -1,15 +1,17 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { postQuestion } from "@/actions/qa";
+import { Avatar } from "@/components/Avatar";
 import { Empty } from "@/components/Empty";
+import { Eyebrow, PageHeader } from "@/components/PageHeader";
 import { QuestionForm } from "@/components/QuestionForm";
 import { QuestionList, type QuestionRow } from "@/components/QuestionList";
-import { postQuestion } from "@/actions/qa";
-import { speakerNames } from "@/components/ScheduleList";
+import { Segmented } from "@/components/Segmented";
 import { copy } from "@/lib/copy";
 import { db } from "@/lib/db";
 import { getOrCreateDeviceId } from "@/lib/device-server";
 import { rankQuestions, splitAnswered } from "@/lib/ranking";
-import { formatDay, formatTimeRange } from "@/lib/time";
+import { speakerLine } from "@/lib/speaker";
+import { DAY_LABELS, formatTimeRange, type EventDay } from "@/lib/time";
 
 export async function generateMetadata({ params }: PageProps<"/sesi/[slug]">) {
   const { slug } = await params;
@@ -26,7 +28,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
   const session = await db.session.findUnique({
     where: { slug },
     include: {
-      speakers: { include: { speaker: { select: { name: true } } } },
+      speakers: { include: { speaker: { select: { name: true, handle: true, bio: true, photoUrl: true, slug: true } } } },
       questions: {
         where: { hidden: false, kind },
         select: { id: true, body: true, displayName: true, createdAt: true, upvoteCount: true, answered: true, answeredAt: true, upvotes: { where: { deviceId }, select: { deviceId: true } } },
@@ -49,48 +51,45 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
   const isThanks = kind === "THANKS";
   const { open, answered } = splitAnswered(rows);
   const list = isThanks ? [...rows].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()) : rankQuestions(open);
-
-  const tabs = [
-    { key: "QUESTION", label: copy.qa.tabQuestions, href: `/sesi/${slug}` },
-    { key: "THANKS", label: copy.qa.tabThanks, href: `/sesi/${slug}?tab=ucapan` },
-  ] as const;
+  const speakers = session.speakers.map((s) => s.speaker);
 
   return (
-    <div className="flex flex-col gap-5 pt-6">
-      <header>
-        <p className="text-caption font-bold uppercase tracking-wide text-primary">
-          {formatDay(session.startsAt)}, {formatTimeRange(session.startsAt, session.endsAt)}
-        </p>
-        <h1 className="mt-1 font-display text-display leading-tight text-fg">{session.title}</h1>
-        <p className="mt-1 text-body text-fg-soft">{speakerNames(session)}</p>
-        {session.description ? <p className="mt-3 text-body text-fg-soft">{session.description}</p> : null}
-      </header>
+    <div className="flex flex-col gap-4 pb-[calc(var(--compose-height)+var(--nav-height)+16px)]">
+      <PageHeader back="/jadwal">
+        <Eyebrow className="min-w-0 flex-1 leading-snug">
+          {DAY_LABELS[(session.day as EventDay) - 1]}, {formatTimeRange(session.startsAt, session.endsAt)}
+        </Eyebrow>
+      </PageHeader>
+      <h1 className="font-display text-h1 text-ink">{session.title}</h1>
 
-      <div role="tablist" className="grid grid-cols-2 gap-1 rounded-md bg-surface-alt p-1">
-        {tabs.map((t) => (
-          <Link
-            key={t.key}
-            href={t.href}
-            scroll={false}
-            role="tab"
-            aria-selected={t.key === kind}
-            className={`flex min-h-[var(--tap-min)] items-center justify-center rounded-sm text-small ${
-              t.key === kind ? "bg-surface font-bold text-fg shadow-card" : "text-fg-soft"
-            }`}
-          >
-            {t.label}
-          </Link>
+      <ul className="flex flex-col gap-2.5">
+        {speakers.map((s) => (
+          <li key={s.slug} className="flex items-center gap-3">
+            <Avatar name={s.name} photoUrl={s.photoUrl} size={48} />
+            <div className="min-w-0">
+              <p className="font-bold text-ink">{s.name}</p>
+              <p className="text-small text-ink-soft">{speakerLine(s)}</p>
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
 
-      <QuestionForm key={kind} action={postQuestion} fields={{ sessionSlug: slug, kind }} placeholder={isThanks ? copy.qa.thanksPlaceholder : copy.qa.placeholder} />
+      <Segmented
+        active={kind}
+        items={[
+          { key: "QUESTION", label: copy.qa.tabQuestions, href: `/sesi/${slug}` },
+          { key: "THANKS", label: copy.qa.tabThanks, href: `/sesi/${slug}?tab=ucapan` },
+        ]}
+      />
 
-      {list.length ? (
+      {list.length || answered.length ? (
         <QuestionList items={list} answered={isThanks ? [] : answered} voting={!isThanks} />
       ) : (
         <Empty kind="questions" title={isThanks ? copy.qa.emptyThanksTitle : copy.qa.emptyTitle} body={isThanks ? copy.qa.emptyThanksBody : copy.qa.emptyBody} />
       )}
+      {!isThanks ? <p className="text-small text-ink-soft">{copy.qa.helper}</p> : null}
 
+      <QuestionForm key={kind} action={postQuestion} fields={{ sessionSlug: slug, kind }} placeholder={isThanks ? copy.qa.thanksPlaceholder : copy.qa.placeholder} />
     </div>
   );
 }

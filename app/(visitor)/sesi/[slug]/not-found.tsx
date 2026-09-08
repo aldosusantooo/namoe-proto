@@ -1,13 +1,16 @@
-import Link from "next/link";
+import { Button } from "@/components/Button";
+import { Empty } from "@/components/Empty";
+import { PageHeader } from "@/components/PageHeader";
 import { copy } from "@/lib/copy";
 
 export default function SessionNotFound() {
   return (
-    <div className="flex flex-col gap-4 pt-8">
-      <h1 className="font-display text-display text-fg">{copy.qa.sessionNotFound}</h1>
-      <Link href="/jadwal" className="inline-flex min-h-[var(--tap-min)] items-center font-bold text-link">
+    <div className="flex flex-col gap-4">
+      <PageHeader title={copy.qa.sessionNotFound} back="/jadwal" />
+      <Empty kind="questions" title={copy.qa.sessionNotFound} />
+      <Button href="/jadwal" variant="ghost">
         {copy.qa.backToSchedule}
-      </Link>
+      </Button>
     </div>
   );
 }
