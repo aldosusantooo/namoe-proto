@@ -26,6 +26,9 @@ export const copy = {
     passportProgress: (n: number, t: number) => `${n} dari ${t} stempel`,
     passportComplete: "Lengkap",
     noSessions: "Belum ada sesi di hari ini",
+    feed: "Feed",
+    feedAll: "Semua",
+    feedWrite: "Tulis kabar",
   },
   directory: {
     search: "Cari tenant atau booth",
@@ -151,6 +154,7 @@ export const copy = {
     photoUrl: "Tautan foto",
     photoUpload: "Unggah dari galeri",
     sent: "Kabar terkirim",
+    anon: "Anonim",
     tenantBadge: "Tenant",
     hiddenTag: "Disembunyikan",
   },

@@ -359,3 +359,11 @@ Copy
 - `Event.prizeCopy` real text ("Goodie bag Namoe Market" is a placeholder in the render).
 - Real photos for the eight tenants Aldo wants on the pitch grid, entered through the tenant dashboard.
 - Whether a shared tenant across two booths (A1 and A2, Little Palmerhaus) should count as one stamp or two; the current logic counts per booth. Product call, not design.
+
+## Amendment 9 Sep, Feed strip on Beranda
+
+Owner decision after session B: the Feed is shown on Beranda, not linked. Section 6.1 order becomes hero, headline talk card, four tiles, Feed strip, Talkshow berikutnya. The "Feed" eyebrow link in the schedule header is removed.
+
+Feed strip (`components/FeedStrip.tsx`): section header `--text-h2` "Feed" with eyebrow "Semua" right (to `/feed`); a horizontal row built like PhotoStrip (gutter bleed, gap 10, hidden scrollbar, right fade) of the three newest visible posts as 160px cards: photo 160 x 160 `radius-md` `2px solid var(--color-edge)` (orange mascot on `--color-cream-deep` when no photo), text Nunito 700 14 clamped to 2 lines, byline Nunito 13 `--color-ink-soft` with CategoryBadge `sm` for tenant posts. Card links to `/feed#post-<id>`. Fourth card: dashed `--color-line-strong` on `--color-cream-deep` with plus icon and "Tulis kabar" Fredoka 600 14 navy, to `/feed?tulis=1` which opens the composer. Empty: Empty (feed) plus `Button ghost` "Tulis kabar". Seed: feed posts dated relative to seed time so the strip reads as current at the pitch; the app still never reads the clock.
+
+Acceptance addition (item 19): Beranda shows the Feed strip between tiles and schedule with three cards plus the write card; first card aligned to the gutter; page height under 1650px at 390 (amended 9 Sep after implementation: the strip as specified adds about 310px to a page that measured 1301px).

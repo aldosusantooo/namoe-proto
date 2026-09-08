@@ -172,6 +172,9 @@ async function seedQuestions(sessionIds: Map<string, { id: string; startsAt: Dat
 }
 
 async function seedFeed() {
+  // Feed posts are dated relative to the moment the seed runs (the app itself never reads the clock).
+  const seedNow = Date.now();
+  const hoursAgo = (h: number) => new Date(seedNow - h * 60 * 60 * 1000);
   const tenants = await db.tenant.findMany({ select: { id: true, slug: true } });
   const tenantId = (slug: string) => {
     const found = tenants.find((t) => t.slug === slug);
@@ -185,7 +188,7 @@ async function seedFeed() {
       authorTenantId: p.tenant ? tenantId(p.tenant) : null,
       displayName: p.displayName,
       deviceId: p.tenant ? null : "seed-author",
-      createdAt: wib(p.day, p.time),
+      createdAt: hoursAgo(p.hoursAgo),
     };
     await db.feedPost.upsert({ where: { id: p.id }, create: { id: p.id, ...data }, update: data });
   }

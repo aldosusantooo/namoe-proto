@@ -7,7 +7,12 @@ import { db } from "@/lib/db";
 
 export const metadata = { title: copy.feed.title };
 
-export default async function FeedPage() {
+function first(v: string | string[] | undefined) {
+  return Array.isArray(v) ? v[0] : v;
+}
+
+export default async function FeedPage({ searchParams }: PageProps<"/feed">) {
+  const openComposer = first((await searchParams).tulis) === "1";
   const posts = await db.feedPost.findMany({
     where: { hidden: false },
     orderBy: { createdAt: "desc" },
@@ -17,7 +22,7 @@ export default async function FeedPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <FeedHeader postFeed={postFeedAsVisitor} />
+      <FeedHeader postFeed={postFeedAsVisitor} initialOpen={openComposer} />
       {posts.length ? (
         <ul className="flex flex-col gap-3">
           {posts.map((p) => (

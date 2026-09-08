@@ -7,9 +7,9 @@ import { Notice } from "./Notice";
 import { FeedComposerForm } from "./tenant-edit/FeedComposer";
 import type { StatefulAction } from "./tenant-edit/TenantDashboard";
 
-/** /feed header: title plus a primary sm "Tulis kabar"; the composer card opens under the header row. */
-export function FeedHeader({ postFeed }: { postFeed: StatefulAction }) {
-  const [open, setOpen] = useState(false);
+/** /feed header: title plus a primary sm "Tulis kabar"; the composer card opens under the header row, or on load with ?tulis=1. */
+export function FeedHeader({ postFeed, initialOpen = false }: { postFeed: StatefulAction; initialOpen?: boolean }) {
+  const [open, setOpen] = useState(initialOpen);
   const [message, setMessage] = useState<string | null>(null);
   return (
     <div className="flex flex-col gap-3">

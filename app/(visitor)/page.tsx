@@ -2,6 +2,7 @@ import { Avatar } from "@/components/Avatar";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Empty } from "@/components/Empty";
+import { FeedStrip } from "@/components/FeedStrip";
 import { MascotBiru, MascotMerah, MascotOranye } from "@/components/icons/Mascots";
 import { Lockup } from "@/components/Lockup";
 import { Eyebrow, SectionHeader } from "@/components/PageHeader";
@@ -17,7 +18,7 @@ import { DAY_LABELS, formatTime, type EventDay } from "@/lib/time";
 export default async function HomePage() {
   const deviceId = await getOrCreateDeviceId();
 
-  const [event, sessions, tenantCount, passport] = await Promise.all([
+  const [event, sessions, tenantCount, passport, feedPosts] = await Promise.all([
     getEvent(),
     db.session.findMany({
       orderBy: [{ day: "asc" }, { startsAt: "asc" }],
@@ -25,6 +26,12 @@ export default async function HomePage() {
     }),
     db.tenant.count(),
     db.passport.findUnique({ where: { deviceId }, select: { completedAt: true, _count: { select: { stamps: true } } } }),
+    db.feedPost.findMany({
+      where: { hidden: false },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+      select: { id: true, body: true, photoUrl: true, displayName: true, authorTenant: { select: { slug: true, name: true, category: true } } },
+    }),
   ]);
 
   const [headline, ...rest] = sessions;
@@ -83,14 +90,13 @@ export default async function HomePage() {
         <Tile href="/paspor" tone="coral" icon="paspor" title={copy.nav.passport} subtitle={passportSub} />
       </nav>
 
+      <FeedStrip posts={feedPosts} />
+
       <section className="flex flex-col gap-2.5">
         <SectionHeader
           title={copy.home.nextTalks}
           action={
-            <>
-              <Eyebrow href="/jadwal">{copy.home.allSchedule}</Eyebrow>
-              <Eyebrow href="/feed">{copy.nav.feed}</Eyebrow>
-            </>
+            <Eyebrow href="/jadwal">{copy.home.allSchedule}</Eyebrow>
           }
         />
         {next.length ? <ScheduleList sessions={next} relativeToDay={(headline?.day ?? 1) as EventDay} /> : <Empty kind="search" title={copy.home.noSessions} />}
