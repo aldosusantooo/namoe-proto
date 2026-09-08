@@ -1,8 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { CategoryChips } from "@/components/CategoryChips";
 import { DirectoryHeader } from "@/components/DirectoryHeader";
-import { Empty } from "@/components/Empty";
-import { TenantCard } from "@/components/TenantCard";
+import { SavedChip, TenantGrid } from "@/components/TenantGrid";
 import { bySlug } from "@/lib/categories";
 import { copy } from "@/lib/copy";
 import { db } from "@/lib/db";
@@ -17,6 +16,7 @@ export default async function TenantDirectoryPage({ searchParams }: PageProps<"/
   const params = await searchParams;
   const category = bySlug(first(params.kategori));
   const q = (first(params.q) ?? "").trim();
+  const savedMode = first(params.simpan) === "1";
 
   // Name, intro, or a booth code ("A37" or "a3" as a prefix).
   const where: Prisma.TenantWhereInput = {
@@ -39,24 +39,14 @@ export default async function TenantDirectoryPage({ searchParams }: PageProps<"/
   });
 
   const mapHref = category ? `/peta?kategori=${category.slug}` : "/peta";
+  const savedHref = q ? `/tenant?simpan=1&q=${encodeURIComponent(q)}` : "/tenant?simpan=1";
+  const countLine = category ? copy.directory.countIn(tenants.length, category.label) : copy.directory.count(tenants.length);
 
   return (
     <div className="flex flex-col gap-4">
       <DirectoryHeader mapHref={mapHref} initialOpen={q.length > 0} />
-      <CategoryChips basePath="/tenant" active={category} extraParams={{ q }} />
-      <p className="-mt-1 text-small text-ink-soft">{category ? copy.directory.countIn(tenants.length, category.label) : copy.directory.count(tenants.length)}</p>
-
-      {tenants.length ? (
-        <ul className="grid grid-cols-2 gap-3">
-          {tenants.map((t) => (
-            <li key={t.slug}>
-              <TenantCard tenant={t} />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <Empty kind="search" title={copy.directory.emptyTitle} body={copy.directory.emptyBody} />
-      )}
+      <CategoryChips basePath="/tenant" active={category} extraParams={{ q }} leading={<SavedChip active={savedMode} href={savedHref} />} allInactive={savedMode} />
+      <TenantGrid tenants={tenants.map((t) => ({ ...t, updatedAt: t.updatedAt.getTime() }))} savedMode={savedMode} countLine={countLine} />
     </div>
   );
 }

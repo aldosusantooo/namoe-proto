@@ -21,7 +21,7 @@ export default async function HomePage() {
     getEvent(),
     db.session.findMany({
       orderBy: [{ day: "asc" }, { startsAt: "asc" }],
-      include: { speakers: { include: { speaker: { select: { name: true, handle: true, photoUrl: true } } } } },
+      include: { speakers: { include: { speaker: { select: { name: true, slug: true, handle: true, photoUrl: true } } } } },
     }),
     db.tenant.count(),
     db.passport.findUnique({ where: { deviceId }, select: { completedAt: true, _count: { select: { stamps: true } } } }),

@@ -2,7 +2,15 @@ import { CATEGORIES, type CategoryInfo } from "@/lib/categories";
 import { copy } from "@/lib/copy";
 import { Chip } from "./Chip";
 
-type Props = { basePath: string; active?: CategoryInfo; extraParams?: Record<string, string | undefined>; leading?: React.ReactNode };
+type Props = {
+  basePath: string;
+  active?: CategoryInfo;
+  extraParams?: Record<string, string | undefined>;
+  /** Rendered before "Semua" (the Tersimpan chip). */
+  leading?: React.ReactNode;
+  /** Set when another filter (saved list) owns the active state, so "Semua" is not highlighted. */
+  allInactive?: boolean;
+};
 
 function href(basePath: string, slug: string | undefined, extra: Record<string, string | undefined>) {
   const params = new URLSearchParams();
@@ -17,7 +25,7 @@ function href(basePath: string, slug: string | undefined, extra: Record<string, 
  * The active category is rendered first after "Semua" so a filtered state is visible without scrolling.
  * URL state via ?kategori=. Doubles as the map legend.
  */
-export function CategoryChips({ basePath, active, extraParams = {}, leading }: Props) {
+export function CategoryChips({ basePath, active, extraParams = {}, leading, allInactive = false }: Props) {
   const ordered = active ? [active, ...CATEGORIES.filter((c) => c.key !== active.key)] : [...CATEGORIES];
   return (
     <div
@@ -25,7 +33,7 @@ export function CategoryChips({ basePath, active, extraParams = {}, leading }: P
       style={{ maskImage: "linear-gradient(90deg, #000 calc(100% - 40px), transparent)", WebkitMaskImage: "linear-gradient(90deg, #000 calc(100% - 40px), transparent)" }}
     >
       {leading}
-      <Chip href={href(basePath, undefined, extraParams)} active={!active}>
+      <Chip href={href(basePath, undefined, extraParams)} active={!active && !allInactive}>
         {copy.directory.all}
       </Chip>
       {ordered.map((c) => (

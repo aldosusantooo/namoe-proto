@@ -66,7 +66,10 @@ type ListProps = {
   relativeToDay?: EventDay;
 };
 
-/** Talk schedule rows: time, title, speaker avatar and name, chevron to the session board. */
+/**
+ * Talk schedule rows: time, title, speaker avatar and name, chevron to the session board.
+ * The row is one stretched link; the speaker line is its own link to the speaker page (no nested anchors).
+ */
 export function ScheduleList({ sessions, relativeToDay }: ListProps) {
   return (
     <RowCard>
@@ -74,20 +77,31 @@ export function ScheduleList({ sessions, relativeToDay }: ListProps) {
         const prefix = relativeToDay !== undefined && s.day !== relativeToDay ? `${DAY_ABBREV[(s.day as EventDay) - 1]} ` : "";
         const first = s.speakers[0]?.speaker;
         return (
-          <SchedRow
-            key={s.slug}
-            href={`/sesi/${s.slug}`}
-            lead={`${prefix}${formatTime(s.startsAt)}`}
-            title={s.title}
-            sub={
-              first ? (
-                <>
-                  <Avatar name={first.name} photoUrl={first.photoUrl} size={24} />
-                  <span className="min-w-0 truncate">{speakerNames(s)}</span>
-                </>
-              ) : undefined
-            }
-          />
+          <div key={s.slug} className="relative flex min-h-16 items-start gap-3.5 px-4 py-3.5">
+            <span className="min-w-14 shrink-0 font-display text-[20px] font-semibold leading-[1.1] text-navy tabular-nums">
+              {prefix}
+              {formatTime(s.startsAt)}
+            </span>
+            <span className="min-w-0 flex-1">
+              <Link href={`/sesi/${s.slug}`} className="block text-body font-extrabold leading-[1.3] text-ink no-underline after:absolute after:inset-0 after:content-['']">
+                {s.title}
+              </Link>
+              {first ? (
+                first.slug ? (
+                  <Link href={`/pembicara/${first.slug}`} className="relative z-10 mt-1 inline-flex min-h-8 items-center gap-2 text-small text-ink-soft no-underline">
+                    <Avatar name={first.name} photoUrl={first.photoUrl} size={24} />
+                    <span className="min-w-0 truncate">{speakerNames(s)}</span>
+                  </Link>
+                ) : (
+                  <span className="mt-1.5 flex items-center gap-2 text-small text-ink-soft">
+                    <Avatar name={first.name} photoUrl={first.photoUrl} size={24} />
+                    <span className="min-w-0 truncate">{speakerNames(s)}</span>
+                  </span>
+                )
+              ) : null}
+            </span>
+            <IconChevronRight size={22} className="shrink-0 self-center text-ink-muted" />
+          </div>
         );
       })}
     </RowCard>

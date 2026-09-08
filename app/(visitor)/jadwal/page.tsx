@@ -9,7 +9,7 @@ export const metadata = { title: copy.nav.schedule };
 
 export default async function SchedulePage() {
   const sessions = await db.session.findMany({
-    include: { speakers: { include: { speaker: { select: { name: true, photoUrl: true } } } } },
+    include: { speakers: { include: { speaker: { select: { name: true, slug: true, photoUrl: true } } } } },
   });
   const byDay = groupByDay(sessions);
   return (

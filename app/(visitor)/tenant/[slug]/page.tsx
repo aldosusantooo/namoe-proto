@@ -13,6 +13,7 @@ import { MiniMap } from "@/components/MiniMap";
 import { Eyebrow, SectionHeader } from "@/components/PageHeader";
 import { PhotoStrip } from "@/components/PhotoStrip";
 import { PlaceholderArt } from "@/components/PlaceholderArt";
+import { SaveButton } from "@/components/SaveButton";
 import { RowCard, SchedRow } from "@/components/ScheduleList";
 import { TenantBoard } from "@/components/TenantBoard";
 import { boothLabel, primaryCode, sortCodes } from "@/lib/booth-label";
@@ -79,6 +80,7 @@ export default async function TenantPage({ params }: PageProps<"/tenant/[slug]">
               {codes.join(", ")}
             </BoothPill>
           ) : null}
+          <SaveButton slug={tenant.slug} size="md" />
         </header>
         <div>
           <CategoryBadge category={tenant.category} />

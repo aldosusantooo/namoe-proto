@@ -170,3 +170,21 @@ export function IconGrid({ size = 24, className, style }: IconProps) {
     </svg>
   );
 }
+
+/** Bookmark heart, outline. Added in session B for the Simpan list (not part of docs/assets). */
+export function IconHeart({ size = 24, className, style }: IconProps) {
+  return (
+    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" className={className} style={style}>
+      <path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 7.5 2.5c0 5.4-7.5 10-7.5 10z" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+/** Bookmark heart, filled (saved state). */
+export function IconHeartFilled({ size = 24, className, style }: IconProps) {
+  return (
+    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" className={className} style={style}>
+      <path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 7.5 2.5c0 5.4-7.5 10-7.5 10z" fill="currentColor" stroke="currentColor" strokeWidth="2.6" strokeLinejoin="round"/>
+    </svg>
+  );
+}

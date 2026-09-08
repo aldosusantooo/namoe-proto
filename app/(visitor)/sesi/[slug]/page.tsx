@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { postQuestion } from "@/actions/qa";
 import { Avatar } from "@/components/Avatar";
@@ -64,12 +65,14 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
 
       <ul className="flex flex-col gap-2.5">
         {speakers.map((s) => (
-          <li key={s.slug} className="flex items-center gap-3">
-            <Avatar name={s.name} photoUrl={s.photoUrl} size={48} />
-            <div className="min-w-0">
-              <p className="font-bold text-ink">{s.name}</p>
-              <p className="text-small text-ink-soft">{speakerLine(s)}</p>
-            </div>
+          <li key={s.slug}>
+            <Link href={`/pembicara/${s.slug}`} className="flex min-h-12 items-center gap-3 no-underline">
+              <Avatar name={s.name} photoUrl={s.photoUrl} size={48} />
+              <span className="min-w-0">
+                <span className="block font-bold text-ink">{s.name}</span>
+                <span className="block text-small text-ink-soft">{speakerLine(s)}</span>
+              </span>
+            </Link>
           </li>
         ))}
       </ul>

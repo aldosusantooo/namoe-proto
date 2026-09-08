@@ -35,6 +35,9 @@ export const copy = {
     emptyTitle: "Tidak ada tenant yang cocok",
     emptyBody: "Coba kata lain atau pilih kategori lain.",
     saved: "Tersimpan",
+    savedCount: (n: number) => `${n} brand tersimpan`,
+    savedEmptyTitle: "Belum ada tenant tersimpan",
+    savedEmptyBody: "Ketuk ikon hati di kartu tenant untuk menyimpannya di sini.",
   },
   tenant: {
     promo: "Promo di booth",
