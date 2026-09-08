@@ -1,0 +1,78 @@
+{
+  "icons/tab": [
+    "beranda.svg",
+    "beranda-active.svg",
+    "tenant.svg",
+    "tenant-active.svg",
+    "peta.svg",
+    "peta-active.svg",
+    "jadwal.svg",
+    "jadwal-active.svg",
+    "paspor.svg",
+    "paspor-active.svg"
+  ],
+  "icons/ui": [
+    "search.svg",
+    "back.svg",
+    "chevron-right.svg",
+    "chevron-down.svg",
+    "upvote.svg",
+    "close.svg",
+    "check.svg",
+    "pin.svg",
+    "zoom-in.svg",
+    "zoom-out.svg",
+    "fit-screen.svg",
+    "instagram.svg",
+    "tiktok.svg",
+    "marketplace.svg",
+    "external-link.svg",
+    "clock.svg",
+    "filter.svg",
+    "qr.svg",
+    "gift.svg",
+    "chat.svg",
+    "grid.svg"
+  ],
+  "glyphs": [
+    "pakaian-ibu-anak.svg",
+    "aksesori-anak.svg",
+    "perlengkapan-rumah.svg",
+    "dekorasi-rumah.svg",
+    "mainan-hobi.svg",
+    "elektronik.svg",
+    "perlengkapan-ibu.svg",
+    "peralatan-dapur.svg",
+    "edukasi.svg",
+    "makanan-minuman.svg"
+  ],
+  "mascots": [
+    "segitiga-biru.svg",
+    "bulat-hijau.svg",
+    "pil-pink.svg",
+    "bunga-merah.svg",
+    "kotak-oranye.svg"
+  ],
+  "stamp": [
+    "stamp-empty.svg",
+    "stamp-pressed.svg",
+    "stamp-baru.svg"
+  ],
+  "empty": [
+    "no-results.svg",
+    "no-questions.svg",
+    "no-stamps.svg"
+  ],
+  "root": [
+    "favicon.svg",
+    "app-icon.svg"
+  ],
+  "placeholder": [
+    "example-card.svg",
+    "example-hero.svg",
+    "example-card-dark-ink.svg"
+  ],
+  "lockup": [
+    "namoe-go-lockup.svg"
+  ]
+}
