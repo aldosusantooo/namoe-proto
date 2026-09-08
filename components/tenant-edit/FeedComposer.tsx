@@ -1,54 +1,51 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import type { ActionResult } from "@/actions/tenant";
 import { copy } from "@/lib/copy";
-import { FEED_MAX } from "@/lib/validate";
+import { FEED_MAX, NAME_MAX } from "@/lib/validate";
 import { Button } from "../Button";
 import { Card } from "../Card";
 import { IconClose } from "../icons/UiIcons";
 import { Notice } from "../Notice";
 import type { StatefulAction } from "./TenantDashboard";
 
-type Props = { postFeed: StatefulAction; tenantName: string; variant?: "ghost" | "primary"; label?: string };
+const NAME_KEY = "nm_name";
 
-/**
- * "Tulis kabar": one line up to 140 characters plus a photo by URL or upload. Used on the tenant dashboard
- * (posts carry the tenant badge) and, with a visitor action, on /feed.
- */
-export function FeedComposer({ postFeed, variant = "ghost", label }: Props) {
-  const [open, setOpen] = useState(false);
-  const [state, action, pending] = useActionState<ActionResult, FormData>(postFeed, null);
+type FormProps = {
+  postFeed: StatefulAction;
+  title: string;
+  /** Visitor posts carry an optional display name; tenant posts do not. */
+  withName?: boolean;
+  onClose: () => void;
+  onPosted: (message?: string) => void;
+};
+
+/** The open composer card: one line up to 140 characters, optional name, photo by URL or upload. */
+export function FeedComposerForm({ postFeed, title, withName = false, onClose, onPosted }: FormProps) {
   const [count, setCount] = useState(0);
   const [fileName, setFileName] = useState<string | null>(null);
-  const lastOk = useRef<ActionResult>(null);
-
-  useEffect(() => {
-    if (state?.ok && state !== lastOk.current) {
-      lastOk.current = state;
-      setOpen(false);
-      setCount(0);
-      setFileName(null);
+  const name = useRef<HTMLInputElement>(null);
+  const [state, action, pending] = useActionState<ActionResult, FormData>(async (prev, formData) => {
+    const result = await postFeed(prev, formData);
+    if (result?.ok) {
+      try {
+        const v = name.current?.value.trim();
+        if (v) window.localStorage.setItem(NAME_KEY, v);
+      } catch {
+        // storage unavailable
+      }
+      onPosted(result.message);
     }
-  }, [state]);
-
-  if (!open) {
-    return (
-      <div className="flex flex-col gap-2">
-        {state?.ok && state.message ? <Notice tone="ok">{state.message}</Notice> : null}
-        <Button variant={variant} block onClick={() => setOpen(true)}>
-          {label ?? copy.tenantEdit.feedWrite}
-        </Button>
-      </div>
-    );
-  }
+    return result;
+  }, null);
 
   return (
     <Card pad>
       <form action={action} className="flex flex-col gap-3">
         <div className="flex items-center gap-2.5">
-          <p className="flex-1 font-display text-h3 text-ink">{label ?? copy.tenantEdit.feedWrite}</p>
-          <Button variant="ghost" icon sm aria-label={copy.common.close} onClick={() => setOpen(false)}>
+          <p className="flex-1 font-display text-h3 text-ink">{title}</p>
+          <Button variant="ghost" icon sm aria-label={copy.common.close} onClick={onClose}>
             <IconClose size={22} />
           </Button>
         </div>
@@ -59,13 +56,26 @@ export function FeedComposer({ postFeed, variant = "ghost", label }: Props) {
           rows={2}
           maxLength={FEED_MAX}
           onInput={(e) => setCount(e.currentTarget.value.length)}
-          placeholder={copy.tenantEdit.feedPlaceholder}
-          aria-label={copy.tenantEdit.feedPlaceholder}
+          placeholder={withName ? copy.feed.placeholder : copy.tenantEdit.feedPlaceholder}
+          aria-label={withName ? copy.feed.placeholder : copy.tenantEdit.feedPlaceholder}
           className="min-h-20 w-full resize-y rounded-md border-2 border-edge bg-paper px-3.5 py-2.5 text-body leading-[1.45] text-ink placeholder:text-ink-muted focus:border-navy focus:outline-none"
         />
         <span className="text-right text-caption text-ink-muted" aria-live="polite">
           {copy.tenantEdit.introCounter(count, FEED_MAX)}
         </span>
+        {withName ? (
+          <input
+            ref={name}
+            name="displayName"
+            type="text"
+            maxLength={NAME_MAX}
+            autoComplete="nickname"
+            defaultValue={readName()}
+            placeholder={copy.qa.name}
+            aria-label={copy.qa.name}
+            className="h-12 w-full rounded-pill border-2 border-edge bg-paper px-4 text-body text-ink placeholder:text-ink-muted focus:border-navy focus:outline-none"
+          />
+        ) : null}
         <input
           name="url"
           type="url"
@@ -75,7 +85,7 @@ export function FeedComposer({ postFeed, variant = "ghost", label }: Props) {
           className="h-12 w-full rounded-pill border-2 border-edge bg-paper px-4 text-body text-ink placeholder:text-ink-muted focus:border-navy focus:outline-none"
         />
         <label className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-pill border-2 border-edge bg-paper px-4 font-display text-[15px] font-semibold text-navy shadow-btn-ghost">
-          {fileName ?? copy.feed.photoUpload}
+          <span className="truncate">{fileName ?? copy.feed.photoUpload}</span>
           <input
             type="file"
             name="file"
@@ -90,5 +100,43 @@ export function FeedComposer({ postFeed, variant = "ghost", label }: Props) {
         </Button>
       </form>
     </Card>
+  );
+}
+
+function readName(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    return window.localStorage.getItem(NAME_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+type Props = { postFeed: StatefulAction; label?: string; variant?: "ghost" | "primary" };
+
+/** Dashboard entry: a ghost "Tulis kabar" button that opens the composer in place. */
+export function FeedComposer({ postFeed, label = copy.tenantEdit.feedWrite, variant = "ghost" }: Props) {
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  if (open) {
+    return (
+      <FeedComposerForm
+        postFeed={postFeed}
+        title={label}
+        onClose={() => setOpen(false)}
+        onPosted={(m) => {
+          setMessage(m ?? null);
+          setOpen(false);
+        }}
+      />
+    );
+  }
+  return (
+    <div className="flex flex-col gap-2">
+      {message ? <Notice tone="ok">{message}</Notice> : null}
+      <Button variant={variant} block onClick={() => setOpen(true)}>
+        {label}
+      </Button>
+    </div>
   );
 }

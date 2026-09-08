@@ -208,7 +208,7 @@ export function TenantDashboard({ tenant, actions }: Props) {
       <section className="flex flex-col gap-2.5">
         <SectionHeader title={copy.tenantEdit.feed} />
         {tenant.feedCount === 0 ? <Empty kind="feed" title={copy.tenantEdit.feedEmptyTitle} body={copy.tenantEdit.feedEmptyBody} /> : null}
-        <FeedComposer postFeed={actions.postFeed} tenantName={tenant.name} />
+        <FeedComposer postFeed={actions.postFeed} />
       </section>
     </div>
   );

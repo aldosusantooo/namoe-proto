@@ -89,6 +89,7 @@ export default async function HomePage() {
           action={
             <>
               <Eyebrow href="/jadwal">{copy.home.allSchedule}</Eyebrow>
+              <Eyebrow href="/feed">{copy.nav.feed}</Eyebrow>
             </>
           }
         />
