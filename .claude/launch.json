@@ -4,8 +4,12 @@
     {
       "name": "namoe-dev",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev"],
-      "port": 3000,
+      "runtimeArgs": [
+        "dev",
+        "-p",
+        "3100"
+      ],
+      "port": 3100,
       "autoPort": true
     }
   ]

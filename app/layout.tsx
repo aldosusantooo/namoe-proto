@@ -6,20 +6,21 @@ import "./globals.css";
 const fredoka = Fredoka({
   variable: "--font-fredoka",
   subsets: ["latin"],
-  weight: ["500", "600"],
+  weight: ["500", "600", "700"],
   display: "swap",
 });
 
 const nunito = Nunito({
   variable: "--font-nunito",
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
+  weight: ["400", "600", "700", "800"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: { default: APP_NAME, template: `%s, ${APP_NAME}` },
   description: "Panduan pengunjung Namoe Market, 22 sampai 25 Oktober 2026 di PIK Avenue Mall.",
+  icons: { icon: "/icon.svg" },
 };
 
 export const viewport: Viewport = {

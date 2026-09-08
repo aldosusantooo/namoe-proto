@@ -1,0 +1,64 @@
+{
+  "generatedFrom": "docs/tokens.css",
+  "base": {
+    "cream": "#FFF6E6",
+    "cream-deep": "#F8E9CF",
+    "paper": "#FFFFFF",
+    "line": "#EADDC4",
+    "line-strong": "#D9C7A5",
+    "edge": "#E3D2B0",
+    "ink": "#1E2A44",
+    "ink-soft": "#4A5570",
+    "ink-muted": "#7C849A",
+    "navy": "#2B5BA8",
+    "navy-deep": "#1B3F7A",
+    "blue": "#4B7FD6",
+    "coral": "#E2574C",
+    "green": "#2BB673",
+    "yellow": "#F5C445",
+    "pink": "#F3A7C0",
+    "orange": "#F7B15C"
+  },
+  "categories": {
+    "aksesori-anak": {
+      "hex": "#2BB673",
+      "ink": "#FFFFFF"
+    },
+    "dekorasi-rumah": {
+      "hex": "#3AAFA9",
+      "ink": "#FFFFFF"
+    },
+    "edukasi": {
+      "hex": "#2B5BA8",
+      "ink": "#FFFFFF"
+    },
+    "elektronik": {
+      "hex": "#6E63D9",
+      "ink": "#FFFFFF"
+    },
+    "mainan-hobi": {
+      "hex": "#F3A7C0",
+      "ink": "#1E2A44"
+    },
+    "makanan-minuman": {
+      "hex": "#F7B15C",
+      "ink": "#FFFFFF"
+    },
+    "pakaian-ibu-anak": {
+      "hex": "#4B7FD6",
+      "ink": "#FFFFFF"
+    },
+    "peralatan-dapur": {
+      "hex": "#F5C445",
+      "ink": "#1E2A44"
+    },
+    "perlengkapan-ibu": {
+      "hex": "#E2574C",
+      "ink": "#FFFFFF"
+    },
+    "perlengkapan-rumah": {
+      "hex": "#8FC1EE",
+      "ink": "#1E2A44"
+    }
+  }
+}

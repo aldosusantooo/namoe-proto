@@ -61,6 +61,7 @@ model Tenant {
   posts       TenantPost[]
   feedPosts   FeedPost[]
   createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt // busts the /img placeholder cache after a rename
 }
 
 model TenantSlot {
