@@ -32,7 +32,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
     {
       href: "/paspor",
       label: copy.nav.passport,
-      sub: passport ? copy.passport.progress(stamps, event.passportTarget) : copy.home.startPassport,
+      sub: passport ? copy.passport.progress(stamps, event.passportTarget) : copy.passport.progress(0, event.passportTarget),
       bg: "var(--color-coral-soft)",
     },
     { href: "/jadwal", label: copy.nav.schedule, sub: copy.home.sessionsCount(sessions.length), bg: "var(--color-yellow-soft)" },
@@ -78,9 +78,9 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       </section>
 
       <section id="jadwal" className="flex flex-col gap-3">
-        <h2 className="font-display text-h1 text-fg">{copy.home.scheduleTitle}</h2>
+        <h2 className="font-display text-h1 text-fg">{copy.nav.schedule}</h2>
         <DayTabs basePath="/" active={day} anchor="jadwal" />
-        {today.length ? <ScheduleList sessions={today} /> : <Empty>{copy.home.noSessions}</Empty>}
+        {today.length ? <ScheduleList sessions={today} /> : <Empty kind="search" title={copy.home.noSessions} />}
       </section>
     </div>
   );

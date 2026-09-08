@@ -3,15 +3,17 @@
 import { startTransition, useOptimistic } from "react";
 import { toggleUpvote } from "@/actions/qa";
 import { copy } from "@/lib/copy";
+import { IconUpvote } from "./icons/UiIcons";
 
 type Props = { questionId: string; count: number; upvoted: boolean };
 
+/** 48 x 52 pill: arrow over the count. Voted state fills navy. One vote per device, toggled. */
 export function UpvoteButton({ questionId, count, upvoted }: Props) {
   const [state, setOptimistic] = useOptimistic({ count, upvoted }, (_, next: { count: number; upvoted: boolean }) => next);
 
   function onClick() {
     startTransition(async () => {
-      setOptimistic({ upvoted: !state.upvoted, count: state.count + (state.upvoted ? -1 : 1) });
+      setOptimistic({ upvoted: !state.upvoted, count: Math.max(0, state.count + (state.upvoted ? -1 : 1)) });
       await toggleUpvote(questionId);
     });
   }
@@ -22,13 +24,11 @@ export function UpvoteButton({ questionId, count, upvoted }: Props) {
       onClick={onClick}
       aria-pressed={state.upvoted}
       aria-label={copy.qa.upvote}
-      className={`flex min-h-[var(--tap-min)] min-w-[var(--tap-min)] flex-col items-center justify-center rounded-md border px-2 font-display text-h3 leading-none transition-colors duration-[var(--duration-fast)] ${
-        state.upvoted ? "border-primary bg-primary text-on-primary" : "border-border bg-surface text-fg"
+      className={`flex w-12 min-h-13 shrink-0 flex-col items-center justify-center gap-px rounded-[14px] border-2 font-display text-body font-semibold leading-none transition-[transform,background-color] duration-[var(--duration-fast)] active:translate-y-0.5 ${
+        state.upvoted ? "border-navy bg-navy text-paper shadow-[0_2px_0_0_var(--color-navy-deep)]" : "border-edge bg-paper text-navy shadow-[0_2px_0_0_var(--color-edge)]"
       }`}
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="m6 14 6-6 6 6" />
-      </svg>
+      <IconUpvote size={20} />
       <span>{state.count}</span>
     </button>
   );

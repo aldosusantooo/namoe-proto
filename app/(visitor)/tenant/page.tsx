@@ -29,7 +29,7 @@ export default async function TenantDirectoryPage({ searchParams }: PageProps<"/
   const tenants = await db.tenant.findMany({
     where,
     orderBy: { name: "asc" },
-    select: { slug: true, name: true, category: true, logoUrl: true, photos: true, booths: { select: { code: true } } },
+    select: { slug: true, name: true, category: true, logoUrl: true, photos: true, updatedAt: true, booths: { select: { code: true } } },
   });
 
   const mapHref = category ? `/peta?kategori=${category.slug}` : "/peta";
@@ -40,14 +40,14 @@ export default async function TenantDirectoryPage({ searchParams }: PageProps<"/
         <div className="flex items-center justify-between">
           <h1 className="font-display text-display text-fg">{copy.nav.tenants}</h1>
           <Link href={mapHref} className="flex min-h-[var(--tap-min)] items-center text-small font-bold text-link">
-            {copy.directory.seeOnMap}
+            {copy.tenant.openMap}
           </Link>
         </div>
         <SearchBox basePath="/tenant" />
         <CategoryChips basePath="/tenant" active={category} extraParams={{ q }} />
       </div>
 
-      <p className="text-small text-fg-muted">{copy.home.tenantsCount(tenants.length)}</p>
+      <p className="text-small text-fg-muted">{copy.directory.count(tenants.length)}</p>
 
       {tenants.length ? (
         <ul className="grid grid-cols-2 gap-3">
@@ -58,7 +58,7 @@ export default async function TenantDirectoryPage({ searchParams }: PageProps<"/
           ))}
         </ul>
       ) : (
-        <Empty>{copy.directory.empty}</Empty>
+        <Empty kind="search" title={copy.directory.emptyTitle} body={copy.directory.emptyBody} />
       )}
     </div>
   );

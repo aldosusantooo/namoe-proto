@@ -1,27 +1,42 @@
-import { cssVar, type CategoryKey } from "@/lib/categories";
+import { copy } from "@/lib/copy";
+import { Card } from "./Card";
+import { Stamp, type StampData } from "./Stamp";
 
-export type StampSlot = { code: string; category: CategoryKey | null };
+export type StampSlot = StampData;
 
-/** `target` slots. Filled slots show the booth code on a category-coloured circle, empty ones a dashed ring. */
-export function StampGrid({ stamps, target }: { stamps: StampSlot[]; target: number }) {
-  const slots = Array.from({ length: target }, (_, i) => stamps[i] ?? null);
+type Props = {
+  stamps: StampData[];
+  target: number;
+  /** Booth code from ?stempel= on this render; that stamp gets the "baru" treatment. Never persisted. */
+  freshCode?: string | null;
+};
+
+/**
+ * The passport booklet: cream card with the grid texture, `target` wavy stamp slots (3 + 2 at 390 with 88px
+ * stamps), then the progress line and one sentence under it. Extra stamps past the target still show.
+ */
+export function StampGrid({ stamps, target, freshCode }: Props) {
+  const count = stamps.length;
+  const slots = Math.max(target, count);
+  const done = count >= target;
+  const title = count === 0 ? copy.passport.collect(target) : done ? copy.passport.done(target) : copy.passport.left(target - count);
+  const body = count === 0 ? copy.passport.collectBody(target) : done ? copy.passport.keepGoing : copy.passport.leftBody(target);
   return (
-    <ul className="flex flex-wrap justify-center gap-3" aria-label="Stempel">
-      {slots.map((slot, i) => (
-        <li
-          key={i}
-          className="flex items-center justify-center rounded-full font-display text-h3 text-white"
-          style={{
-            width: "var(--stamp-size)",
-            height: "var(--stamp-size)",
-            background: slot ? (slot.category ? cssVar(slot.category) : "var(--color-fg)") : "var(--stamp-empty)",
-            border: slot ? "none" : "2px dashed var(--stamp-empty-stroke)",
-            transform: slot ? `rotate(${((i * 7) % 11) - 5}deg)` : undefined,
-          }}
-        >
-          {slot ? slot.code : ""}
-        </li>
-      ))}
-    </ul>
+    <Card as="section" className="texture-grid bg-cream px-3.5 pb-4 pt-[18px]" aria-label={copy.passport.stampsLabel}>
+      <ul className="flex flex-wrap items-center justify-center px-1 py-1.5" style={{ gap: "var(--stamp-gap-y) var(--stamp-gap-x)" }}>
+        {Array.from({ length: slots }, (_, i) => {
+          const s = stamps[i] ?? null;
+          return (
+            <li key={i} className="flex">
+              <Stamp slot={i + 1} stamp={s} fresh={Boolean(s && freshCode && s.code === freshCode)} />
+            </li>
+          );
+        })}
+      </ul>
+      <div className="mt-4 text-center">
+        <p className="font-display text-h2 text-ink">{title}</p>
+        <p className="mt-1 text-body text-ink-soft">{body}</p>
+      </div>
+    </Card>
   );
 }

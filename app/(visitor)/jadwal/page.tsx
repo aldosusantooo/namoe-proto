@@ -11,7 +11,7 @@ export default async function SchedulePage() {
   const byDay = groupByDay(sessions);
   return (
     <div className="flex flex-col gap-6 pt-6">
-      <h1 className="font-display text-display text-fg">{copy.home.scheduleTitle}</h1>
+      <h1 className="font-display text-display text-fg">{copy.nav.schedule}</h1>
       {EVENT_DAYS.map((day) => (
         <section key={day} className="flex flex-col gap-2">
           <h2 className="font-display text-h2 text-navy">{DAY_LABELS[day - 1]}</h2>

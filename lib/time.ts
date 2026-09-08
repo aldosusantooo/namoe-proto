@@ -37,6 +37,8 @@ export function formatTimeRange(start: Date, end: Date): string {
 }
 
 export const DAY_LABELS = ["Kamis 22 Okt", "Jumat 23 Okt", "Sabtu 24 Okt", "Minggu 25 Okt"] as const;
+/** Three-letter day prefix for a time column that mixes days ("Jum 13.00"). */
+export const DAY_ABBREV = ["Kam", "Jum", "Sab", "Min"] as const;
 export type EventDay = 1 | 2 | 3 | 4;
 export const EVENT_DAYS: EventDay[] = [1, 2, 3, 4];
 

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fredoka, Nunito } from "next/font/google";
 import { APP_NAME } from "@/lib/copy";
+import tokens from "@/lib/tokens.generated.json";
 import "./globals.css";
 
 const fredoka = Fredoka({
@@ -27,7 +28,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#FFF6E6",
+  themeColor: tokens.base.cream,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

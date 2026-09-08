@@ -1,31 +1,34 @@
 import { copy } from "@/lib/copy";
-import { formatDay, formatTime } from "@/lib/time";
-import { Card } from "./Card";
+import { IconGift } from "./icons/UiIcons";
+import { Eyebrow } from "./PageHeader";
 
 type Props = { code: string; prizeCopy: string; redeemedAt: Date | null };
 
+/** The prize ticket: coral, cream code at 56px, dashed perforation, tear notches at the sides, prize line below. */
 export function RedeemCard({ code, prizeCopy, redeemedAt }: Props) {
   return (
-    <Card as="section" className="border-t-4 border-success text-center">
-      {redeemedAt ? (
-        <>
-          <p className="font-display text-h1 text-fg">{copy.passport.redeemed}</p>
-          <p className="mt-1 text-small text-fg-soft">
-            {copy.passport.redeemedAt(`${formatDay(redeemedAt)} ${formatTime(redeemedAt)}`)}
-          </p>
-          <p className="mt-3 font-display text-h2 tracking-[0.2em] text-fg-muted line-through">{code}</p>
-        </>
-      ) : (
-        <>
-          <p className="font-display text-h1 text-fg">{copy.passport.complete}</p>
-          <p className="mt-3 font-display text-display-lg tracking-[0.25em] text-navy">{code}</p>
-          <p className="mt-2 text-body text-fg-soft">{copy.passport.showCode}</p>
-        </>
-      )}
-      <div className="mt-4 rounded-md bg-success-soft p-3 text-left">
-        <p className="text-caption font-bold uppercase tracking-wide text-fg-soft">{copy.passport.prize}</p>
-        <p className="mt-0.5 text-body text-fg">{prizeCopy}</p>
+    <section
+      className="relative overflow-hidden rounded-lg px-[18px] pb-[18px] pt-5 text-paper"
+      style={{ background: "var(--ticket-bg)" }}
+      aria-label={copy.passport.complete}
+    >
+      <span aria-hidden="true" className="absolute -left-[13px] top-[calc(50%-13px)] size-[26px] rounded-full bg-cream" />
+      <span aria-hidden="true" className="absolute -right-[13px] top-[calc(50%-13px)] size-[26px] rounded-full bg-cream" />
+      <Eyebrow tone="cream">{redeemedAt ? copy.passport.redeemed : copy.passport.complete}</Eyebrow>
+      <p
+        className={`my-1 font-display text-code tracking-[0.08em] tabular-nums ${redeemedAt ? "line-through opacity-70" : ""}`}
+        style={{ color: "var(--ticket-ink)" }}
+      >
+        {code}
+      </p>
+      {redeemedAt ? null : <p className="font-bold">{copy.passport.show}</p>}
+      <div className="-mx-[18px] mt-4 flex items-center gap-3 border-t-[3px] border-dashed border-paper/50 px-[18px] pt-3.5">
+        <IconGift size={30} className="shrink-0" />
+        <div>
+          <p className="text-small font-extrabold opacity-90">{copy.passport.prize}</p>
+          <p className="font-display text-h3">{prizeCopy}</p>
+        </div>
       </div>
-    </Card>
+    </section>
   );
 }

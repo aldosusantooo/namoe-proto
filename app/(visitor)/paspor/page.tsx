@@ -45,12 +45,12 @@ export default async function PassportPage({ searchParams }: PageProps<"/paspor"
     <div className="flex flex-col gap-5 pt-6">
       <header>
         <h1 className="font-display text-display text-fg">{copy.passport.title}</h1>
-        <p className="mt-1 text-body text-fg-soft">{copy.passport.subtitle(event.passportTarget)}</p>
+        <p className="mt-1 text-body text-fg-soft">{copy.passport.collect(event.passportTarget)}</p>
       </header>
 
-      {stamped ? <Notice tone="success">{copy.passport.stamped(stamped)}</Notice> : null}
-      {already ? <Notice tone="warning">{copy.passport.already(already)}</Notice> : null}
-      {unknown ? <Notice tone="danger">{copy.passport.unknown}</Notice> : null}
+      {stamped ? <Notice tone="ok">{copy.passport.newStampEmpty(stamped)}</Notice> : null}
+      {already ? <Notice tone="warn">{copy.passport.already(already)}</Notice> : null}
+      {unknown ? <Notice tone="warn">{copy.passport.unknown}</Notice> : null}
 
       {p.done && passport.redeemCode ? (
         <RedeemCard code={passport.redeemCode} prizeCopy={event.prizeCopy} redeemedAt={passport.redeemedAt} />
@@ -59,7 +59,7 @@ export default async function PassportPage({ searchParams }: PageProps<"/paspor"
       <Card as="section" className="flex flex-col items-center gap-4 py-6 texture-grid">
         <StampGrid stamps={stamps} target={event.passportTarget} />
         <p className="font-display text-h2 text-fg">{copy.passport.progress(Math.min(p.count, p.target), p.target)}</p>
-        {!p.done ? <p className="text-center text-small text-fg-soft">{copy.passport.howTo}</p> : null}
+        {!p.done ? <p className="text-center text-small text-fg-soft">{copy.passport.howBody}</p> : null}
       </Card>
 
       <section className="flex flex-col gap-2">
@@ -92,7 +92,7 @@ export default async function PassportPage({ searchParams }: PageProps<"/paspor"
             })}
           </ul>
         ) : (
-          <Empty>{copy.passport.emptyVisited}</Empty>
+          <Empty kind="stamps" title={copy.passport.how} body={copy.passport.howBody} />
         )}
       </section>
     </div>

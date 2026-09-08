@@ -40,11 +40,11 @@ export default async function OrganizerRedeemPage({ params, searchParams }: Page
           className="h-12 min-w-0 flex-1 rounded-md border border-border bg-surface px-4 font-display text-h2 uppercase tracking-[0.15em] text-fg focus:border-primary focus:outline-none"
         />
         <button type="submit" className="inline-flex h-12 items-center rounded-pill bg-primary px-5 font-bold text-on-primary">
-          {copy.organizer.find}
+          {copy.organizer.check}
         </button>
       </form>
 
-      {raw && !passport ? <Notice tone="danger">{copy.organizer.notFound}</Notice> : null}
+      {raw && !passport ? <Notice tone="warn">{copy.organizer.notFound}</Notice> : null}
 
       {passport && code ? (
         <Card as="section" className="flex flex-col gap-4">
@@ -58,7 +58,7 @@ export default async function OrganizerRedeemPage({ params, searchParams }: Page
             <dd className="text-fg">{passport.redeemedAt ? when(passport.redeemedAt) : copy.organizer.notRedeemed}</dd>
           </dl>
           {passport.redeemedAt ? (
-            <Notice tone="warning">{copy.organizer.alreadyRedeemed}</Notice>
+            <Notice tone="warn">{copy.organizer.alreadyRedeemed}</Notice>
           ) : (
             <form action={markRedeemed.bind(null, secret, passport.id)}>
               <button type="submit" className="inline-flex min-h-[var(--tap-min)] items-center rounded-pill bg-success px-5 font-bold text-white">

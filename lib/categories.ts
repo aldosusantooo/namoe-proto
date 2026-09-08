@@ -1,3 +1,5 @@
+import tokens from "./tokens.generated.json";
+
 export const CATEGORIES = [
   { key: "PAKAIAN_IBU_ANAK", slug: "pakaian-ibu-anak", label: "Pakaian ibu dan anak" },
   { key: "AKSESORI_ANAK", slug: "aksesori-anak", label: "Aksesori anak" },
@@ -26,10 +28,20 @@ export function byKey(key: string): CategoryInfo {
 }
 
 /** `var(--color-cat-<slug>)`; the colour itself lives only in tokens.css. */
-export function cssVar(key: CategoryKey): string {
+export function catVar(key: CategoryKey): string {
   return `var(--color-cat-${byKey(key).slug})`;
 }
 
-export function cssVarSoft(key: CategoryKey): string {
-  return `var(--color-cat-${byKey(key).slug}-soft)`;
+/** Text and glyph colour on top of that category's block: white, or ink on the three light hues. */
+export function catInkVar(key: CategoryKey): string {
+  return `var(--color-cat-${byKey(key).slug}-ink)`;
+}
+
+/** Kept for callers that still pass the enum name around as a string. */
+export const cssVar = catVar;
+
+/** True for the hues whose on-colour ink is dark (from docs/tokens.css through the generated JSON). */
+export function isLightHue(key: CategoryKey): boolean {
+  const slug = byKey(key).slug as keyof typeof tokens.categories;
+  return tokens.categories[slug]?.ink.toUpperCase() !== tokens.base.paper.toUpperCase();
 }

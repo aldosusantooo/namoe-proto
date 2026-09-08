@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { Card } from "@/components/Card";
+import { Empty } from "@/components/Empty";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { MiniMap } from "@/components/MiniMap";
 import { boothLabel, primaryCode } from "@/lib/booth-label";
@@ -80,7 +81,7 @@ export default async function TenantPage({ params }: PageProps<"/tenant/[slug]">
           <div className="flex items-center justify-between gap-3">
             <p className="font-display text-h2 text-fg">{copy.tenant.booth(boothLabel(codes))}</p>
             <Link href={`/peta?booth=${primary}`} className="flex min-h-[var(--tap-min)] items-center text-small font-bold text-link">
-              {copy.tenant.seeOnMap}
+              {copy.tenant.openMap}
             </Link>
           </div>
         </Card>
@@ -142,16 +143,7 @@ export default async function TenantPage({ params }: PageProps<"/tenant/[slug]">
             ))}
           </ul>
         ) : null}
-        <div className="rounded-lg border border-dashed border-line-strong bg-surface-alt p-4">
-          <textarea
-            disabled
-            rows={2}
-            aria-label={copy.tenant.ask}
-            className="w-full resize-none rounded-md border border-border bg-surface px-3 py-2 text-body text-fg-muted"
-            placeholder={copy.tenant.askSoon}
-          />
-          <p className="mt-2 text-small text-fg-muted">{copy.tenant.askSoon}</p>
-        </div>
+        {tenant.posts.length ? null : <Empty kind="questions" title={copy.tenant.askEmptyTitle} body={copy.tenant.askEmptyBody} />}
       </section>
     </article>
   );

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CATEGORIES, byKey, bySlug, cssVar, cssVarSoft } from "../categories";
+import { CATEGORIES, byKey, bySlug, catInkVar, catVar, isLightHue } from "../categories";
 
 describe("categories", () => {
   it("has ten unique keys and slugs", () => {
@@ -14,7 +14,14 @@ describe("categories", () => {
     expect(() => byKey("NOPE")).toThrow();
   });
   it("builds css variable references", () => {
-    expect(cssVar("PAKAIAN_IBU_ANAK")).toBe("var(--color-cat-pakaian-ibu-anak)");
-    expect(cssVarSoft("MAKANAN_MINUMAN")).toBe("var(--color-cat-makanan-minuman-soft)");
+    expect(catVar("PAKAIAN_IBU_ANAK")).toBe("var(--color-cat-pakaian-ibu-anak)");
+    expect(catInkVar("MAKANAN_MINUMAN")).toBe("var(--color-cat-makanan-minuman-ink)");
+  });
+  it("knows the three light hues that take ink text, from the generated tokens", () => {
+    expect(isLightHue("PERALATAN_DAPUR")).toBe(true);
+    expect(isLightHue("MAINAN_HOBI")).toBe(true);
+    expect(isLightHue("PERLENGKAPAN_RUMAH")).toBe(true);
+    expect(isLightHue("EDUKASI")).toBe(false);
+    expect(CATEGORIES.filter((c) => isLightHue(c.key))).toHaveLength(3);
   });
 });

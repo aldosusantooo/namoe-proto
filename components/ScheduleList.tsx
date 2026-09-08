@@ -1,35 +1,95 @@
 import Link from "next/link";
-import { formatTime } from "@/lib/time";
+import { DAY_ABBREV, formatTime, type EventDay } from "@/lib/time";
+import { Avatar } from "./Avatar";
+import { Card } from "./Card";
+import { IconChevronRight } from "./icons/UiIcons";
 
 export type ScheduleSession = {
   slug: string;
   title: string;
+  day: number;
   startsAt: Date;
   endsAt: Date;
-  speakers: { speaker: { name: string } }[];
+  speakers: { speaker: { name: string; slug?: string; photoUrl?: string | null } }[];
 };
 
 export function speakerNames(s: { speakers: { speaker: { name: string } }[] }) {
   return s.speakers.map((x) => x.speaker.name).join(", ");
 }
 
-export function ScheduleList({ sessions }: { sessions: ScheduleSession[] }) {
+type RowProps = {
+  /** Time column text: "15.00", "Jum 13.00", or a booth code. */
+  lead: React.ReactNode;
+  title: React.ReactNode;
+  sub?: React.ReactNode;
+  href?: string;
+  /** Replaces the chevron. */
+  trailing?: React.ReactNode;
+  leadClassName?: string;
+  className?: string;
+};
+
+/** One list row: lead column in Fredoka navy, title Nunito 800, optional sub line, chevron or custom trailing. */
+export function SchedRow({ lead, title, sub, href, trailing, leadClassName = "", className = "" }: RowProps) {
+  const inner = (
+    <>
+      <span className={`min-w-14 shrink-0 font-display text-[20px] font-semibold leading-[1.1] text-navy tabular-nums ${leadClassName}`}>{lead}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-body font-extrabold leading-[1.3] text-ink">{title}</span>
+        {sub ? <span className="mt-1.5 flex items-center gap-2 text-small text-ink-soft">{sub}</span> : null}
+      </span>
+      {trailing !== undefined ? (
+        <span className="flex shrink-0 items-center self-center">{trailing}</span>
+      ) : href ? (
+        <IconChevronRight size={22} className="shrink-0 self-center text-ink-muted" />
+      ) : null}
+    </>
+  );
+  const cls = `flex min-h-16 items-start gap-3.5 px-4 py-3.5 no-underline ${className}`;
+  return href ? (
+    <Link href={href} className={cls}>
+      {inner}
+    </Link>
+  ) : (
+    <div className={cls}>{inner}</div>
+  );
+}
+
+/** Card holding rows with a 2px line between them. */
+export function RowCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <Card className={`flex flex-col divide-y-2 divide-line ${className}`}>{children}</Card>;
+}
+
+type ListProps = {
+  sessions: ScheduleSession[];
+  /** When set, sessions on another day get a three-letter day prefix in the time column ("Jum 13.00"). */
+  relativeToDay?: EventDay;
+};
+
+/** Talk schedule rows: time, title, speaker avatar and name, chevron to the session board. */
+export function ScheduleList({ sessions, relativeToDay }: ListProps) {
   return (
-    <ul className="divide-y divide-border overflow-hidden rounded-lg bg-surface shadow-card">
-      {sessions.map((s) => (
-        <li key={s.slug}>
-          <Link href={`/sesi/${s.slug}`} className="flex min-h-[var(--tap-min)] items-center gap-4 px-4 py-3">
-            <span className="w-14 shrink-0 font-display text-h3 text-navy">{formatTime(s.startsAt)}</span>
-            <span className="flex-1">
-              <span className="block text-body font-bold text-fg">{s.title}</span>
-              <span className="block text-small text-fg-soft">{speakerNames(s)}</span>
-            </span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-fg-muted" aria-hidden="true">
-              <path d="m9 6 6 6-6 6" />
-            </svg>
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <RowCard>
+      {sessions.map((s) => {
+        const prefix = relativeToDay !== undefined && s.day !== relativeToDay ? `${DAY_ABBREV[(s.day as EventDay) - 1]} ` : "";
+        const first = s.speakers[0]?.speaker;
+        return (
+          <SchedRow
+            key={s.slug}
+            href={`/sesi/${s.slug}`}
+            lead={`${prefix}${formatTime(s.startsAt)}`}
+            title={s.title}
+            sub={
+              first ? (
+                <>
+                  <Avatar name={first.name} photoUrl={first.photoUrl} size={24} />
+                  <span className="min-w-0 truncate">{speakerNames(s)}</span>
+                </>
+              ) : undefined
+            }
+          />
+        );
+      })}
+    </RowCard>
   );
 }

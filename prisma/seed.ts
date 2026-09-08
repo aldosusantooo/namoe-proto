@@ -58,19 +58,19 @@ async function seedBooths() {
 async function seedTenants() {
   const assigned = new Set<string>();
   for (const t of TENANTS) {
+    // No fake product photos: the card and the page fall back to the generated placeholder art.
+    // Photos and the logo are entered through the tenant dashboard, so a re-seed never touches them.
     const data = {
       name: t.name,
       category: t.category,
       intro: t.intro,
       promo: t.promo,
-      photos: [1, 2, 3].map((n) => `/img/${t.slug}?n=${n}`),
-      logoUrl: `/img/${t.slug}?logo=1`,
       instagram: t.instagram,
       color: t.color,
     };
     const tenant = await db.tenant.upsert({
       where: { slug: t.slug },
-      create: { slug: t.slug, editToken: token(), ...data },
+      create: { slug: t.slug, editToken: token(), photos: [], logoUrl: null, ...data },
       update: data,
     });
 

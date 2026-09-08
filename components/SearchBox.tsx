@@ -3,9 +3,12 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { copy } from "@/lib/copy";
+import { IconSearch } from "./icons/UiIcons";
 
-/** Search input bound to ?q=. Debounced replace while typing, push on submit. */
-export function SearchBox({ basePath }: { basePath: string }) {
+type Props = { basePath: string; autoFocus?: boolean };
+
+/** 48px pill search bound to ?q=. Debounced replace while typing, push on submit. Matches names and booth codes. */
+export function SearchBox({ basePath, autoFocus = false }: Props) {
   const router = useRouter();
   const params = useSearchParams();
   const current = params.get("q") ?? "";
@@ -17,6 +20,10 @@ export function SearchBox({ basePath }: { basePath: string }) {
     const el = input.current;
     if (el && document.activeElement !== el && el.value !== current) el.value = current;
   }, [current]);
+
+  useEffect(() => {
+    if (autoFocus) input.current?.focus();
+  }, [autoFocus]);
 
   function hrefFor(q: string) {
     const next = new URLSearchParams(params.toString());
@@ -41,10 +48,7 @@ export function SearchBox({ basePath }: { basePath: string }) {
       }}
       className="relative"
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-fg-muted" aria-hidden="true">
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-3.5-3.5" />
-      </svg>
+      <IconSearch size={22} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink" />
       <input
         ref={input}
         type="search"
@@ -54,7 +58,8 @@ export function SearchBox({ basePath }: { basePath: string }) {
         placeholder={copy.directory.search}
         aria-label={copy.directory.search}
         autoComplete="off"
-        className="h-12 w-full rounded-pill border border-border bg-surface pl-12 pr-4 text-body text-fg placeholder:text-fg-muted focus:border-primary focus:outline-none"
+        enterKeyHint="search"
+        className="h-12 w-full rounded-pill border-2 border-edge bg-paper pl-12 pr-4 text-body text-ink placeholder:text-ink-muted focus:border-navy focus:outline-none"
       />
     </form>
   );

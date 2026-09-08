@@ -77,7 +77,7 @@ export default async function OrganizerSessionPage({ params }: PageProps<"/organ
 
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-h1 text-fg">{copy.organizer.openQuestions}</h2>
-        {ranked.length ? ranked.map((q) => <Row key={q.id} q={q} secret={secret} />) : <Empty>{copy.qa.emptyQuestions}</Empty>}
+        {ranked.length ? ranked.map((q) => <Row key={q.id} q={q} secret={secret} />) : <Empty kind="questions" title={copy.qa.emptyTitle} body={copy.qa.emptyBody} />}
       </section>
 
       {answered.length ? (

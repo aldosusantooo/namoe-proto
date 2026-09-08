@@ -1,6 +1,5 @@
 import { CategoryChips } from "@/components/CategoryChips";
 import { FloorMap } from "@/components/FloorMap";
-import { MapLegend } from "@/components/MapLegend";
 import { bySlug } from "@/lib/categories";
 import { copy } from "@/lib/copy";
 import { loadMapBooths } from "@/lib/map-data";
@@ -30,7 +29,6 @@ export default async function MapPage({ searchParams }: PageProps<"/peta">) {
       <h1 className="font-display text-display text-fg">{copy.map.title}</h1>
       <CategoryChips basePath="/peta" active={category} />
       <FloorMap booths={booths} activeCategory={category?.key} highlightCodes={highlightCodes} />
-      <MapLegend />
     </div>
   );
 }

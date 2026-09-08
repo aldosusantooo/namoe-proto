@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Empty } from "@/components/Empty";
 import { QuestionForm } from "@/components/QuestionForm";
-import { AnsweredList, QuestionList, type QuestionRow } from "@/components/QuestionList";
+import { QuestionList, type QuestionRow } from "@/components/QuestionList";
+import { postQuestion } from "@/actions/qa";
 import { speakerNames } from "@/components/ScheduleList";
 import { copy } from "@/lib/copy";
 import { db } from "@/lib/db";
@@ -82,15 +83,14 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
         ))}
       </div>
 
-      <QuestionForm key={kind} sessionSlug={slug} kind={kind} />
+      <QuestionForm key={kind} action={postQuestion} fields={{ sessionSlug: slug, kind }} placeholder={isThanks ? copy.qa.thanksPlaceholder : copy.qa.placeholder} />
 
       {list.length ? (
-        <QuestionList items={list} voting={!isThanks} />
+        <QuestionList items={list} answered={isThanks ? [] : answered} voting={!isThanks} />
       ) : (
-        <Empty>{isThanks ? copy.qa.emptyThanks : copy.qa.emptyQuestions}</Empty>
+        <Empty kind="questions" title={isThanks ? copy.qa.emptyThanksTitle : copy.qa.emptyTitle} body={isThanks ? copy.qa.emptyThanksBody : copy.qa.emptyBody} />
       )}
 
-      {!isThanks ? <AnsweredList items={answered} /> : null}
     </div>
   );
 }
