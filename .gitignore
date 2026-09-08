@@ -34,3 +34,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# tenant photo uploads (prototype, local disk)
+/public/uploads/*
+!/public/uploads/.gitkeep

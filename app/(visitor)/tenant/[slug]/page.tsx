@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
+import { postTenantQuestion } from "@/actions/tenant-board";
 import { after } from "next/server";
 import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/Button";
+import { QuestionForm } from "@/components/QuestionForm";
 import { Card } from "@/components/Card";
 import { BoothPill, CategoryBadge } from "@/components/CategoryBadge";
 import { LinkChip } from "@/components/Chip";
@@ -148,9 +150,7 @@ export default async function TenantPage({ params }: PageProps<"/tenant/[slug]">
         ) : (
           <Empty kind="questions" title={copy.tenant.askEmptyTitle} body={copy.tenant.askEmptyBody} />
         )}
-        <Button variant="primary" block disabled>
-          {copy.tenant.askWrite}
-        </Button>
+        <QuestionForm trigger="button" action={postTenantQuestion} fields={{ tenantSlug: tenant.slug }} placeholder={copy.tenant.askPlaceholder} buttonLabel={copy.tenant.askWrite} />
       </section>
     </article>
   );
