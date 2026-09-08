@@ -14,6 +14,8 @@ export type OrganizerSessionRow = {
   questions: number;
   /** Open and not yet answered. */
   unanswered: number;
+  /** Total upvotes on open questions; shown on the moderation index only. */
+  upvotes?: number;
 };
 
 /** One card per event day, rows link to the moderation page; the count turns coral when there is work to do. */
@@ -30,8 +32,9 @@ export function OrganizerSessionDays({ secret, sessions }: { secret: string; ses
                 <Link href={`/organizer/${secret}/sesi/${s.slug}`} className="grid min-h-11 grid-cols-[52px_1fr_auto_24px] items-center gap-3 px-4 py-2.5 text-[15px] text-ink no-underline">
                   <span className="font-display text-body font-semibold text-navy">{formatTime(s.startsAt)}</span>
                   <span className="min-w-0">{s.title}</span>
-                  <span className={`whitespace-nowrap font-extrabold ${s.unanswered > 0 ? "text-coral" : "text-ink-soft"}`}>
+                  <span className={`whitespace-nowrap text-right font-extrabold ${s.unanswered > 0 ? "text-coral" : "text-ink-soft"}`}>
                     {s.questions > 0 ? copy.organizer.questionsCount(s.questions) : "0"}
+                    {s.upvotes !== undefined && s.questions > 0 ? <span className="block text-caption font-bold text-ink-soft">{copy.organizer.upvotesCount(s.upvotes)}</span> : null}
                   </span>
                   <IconChevronRight size={24} className="text-ink-muted" />
                 </Link>

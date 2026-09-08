@@ -53,7 +53,7 @@ export default async function OrganizerHomePage({ params }: PageProps<"/organize
       title={copy.organizer.summary}
       hint={copy.organizer.summaryHint}
       action={
-        <Button href={`/organizer/${secret}/booth`} variant="ghost" sm>
+        <Button href={`/organizer/${secret}/booth/cetak`} variant="ghost" sm>
           <IconQr size={20} />
           {copy.organizer.printQr}
         </Button>

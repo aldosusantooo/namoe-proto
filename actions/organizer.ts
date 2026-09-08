@@ -36,3 +36,24 @@ export async function markRedeemed(secret: string, passportId: string): Promise<
   revalidatePath("/paspor");
   revalidatePath(`/organizer/${secret}/tukar`);
 }
+
+/** Tanya tenant moderation: hide or show a post from the organizer panel. A hidden post also loses its pin. */
+export async function setTenantPostHidden(secret: string, postId: string, hidden: boolean): Promise<void> {
+  check(secret);
+  const post = await db.tenantPost.update({
+    where: { id: postId },
+    data: hidden ? { hidden, pinned: false } : { hidden },
+    select: { tenant: { select: { slug: true, editToken: true } } },
+  });
+  revalidatePath(`/tenant/${post.tenant.slug}`);
+  revalidatePath(`/t/${post.tenant.editToken}/edit`);
+  revalidatePath(`/organizer/${secret}/tenant`, "layout");
+}
+
+/** Feed moderation: hide or show a visitor or tenant post. */
+export async function setFeedPostHidden(secret: string, postId: string, hidden: boolean): Promise<void> {
+  check(secret);
+  await db.feedPost.update({ where: { id: postId }, data: { hidden } });
+  revalidatePath("/feed");
+  revalidatePath(`/organizer/${secret}/tenant`, "layout");
+}

@@ -10,7 +10,7 @@ export default async function OrganizerSessionsPage({ params }: PageProps<"/orga
   const { secret } = await params;
   requireOrganizer(secret);
   const sessions = await db.session.findMany({
-    select: { slug: true, title: true, day: true, startsAt: true, questions: { where: { kind: "QUESTION", hidden: false }, select: { answered: true } } },
+    select: { slug: true, title: true, day: true, startsAt: true, questions: { where: { kind: "QUESTION", hidden: false }, select: { answered: true, upvoteCount: true } } },
   });
   const rows = sessions.map((s) => ({
     slug: s.slug,
@@ -19,6 +19,7 @@ export default async function OrganizerSessionsPage({ params }: PageProps<"/orga
     startsAt: s.startsAt,
     questions: s.questions.length,
     unanswered: s.questions.filter((q) => !q.answered).length,
+    upvotes: s.questions.reduce((sum, q) => sum + q.upvoteCount, 0),
   }));
   return (
     <OrganizerShell secret={secret} active="questions" title={copy.organizer.questions} hint={copy.organizer.questionsHint}>

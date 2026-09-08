@@ -253,6 +253,8 @@ export const copy = {
     posts: (n: number) => `${n} pertanyaan tenant`,
     feedPosts: (n: number) => `${n} kabar`,
     postsPerDay: "Kabar per hari",
+    outsideEvent: "Di luar hari acara",
+    visitorFeed: "Kabar pengunjung",
     qrSheetTitle: "Lembar QR booth",
     qrSheetHint: "Satu halaman A4 per booth. Cetak dari browser, kertas tanpa warna latar.",
     scanToStamp: "Scan untuk stempel paspor",

@@ -40,7 +40,7 @@ export function OrganizerTenantList({ secret, tenants, total, title = copy.organ
                 </span>
               </span>
               <Eyebrow href={`/t/${t.editToken}/edit`}>{copy.organizer.editLink}</Eyebrow>
-              <Eyebrow href={`/organizer/${secret}/booth#${codes[0] ?? ""}`}>{copy.organizer.qr}</Eyebrow>
+              <Eyebrow href={`/organizer/${secret}/booth/cetak?booth=${codes[0] ?? ""}`}>{copy.organizer.qr}</Eyebrow>
             </li>
           );
         })}

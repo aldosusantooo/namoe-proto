@@ -1,5 +1,8 @@
 import { headers } from "next/headers";
+import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
+import { IconQr } from "@/components/icons/UiIcons";
+import { Eyebrow } from "@/components/PageHeader";
 import { OrganizerShell } from "@/components/OrganizerShell";
 import { boothNumber } from "@/lib/booth-label";
 import { copy } from "@/lib/copy";
@@ -17,7 +20,18 @@ export default async function OrganizerBoothLinksPage({ params }: PageProps<"/or
   booths.sort((a, b) => boothNumber(a.code) - boothNumber(b.code));
 
   return (
-    <OrganizerShell secret={secret} active="booths" title={copy.organizer.boothLinks} hint={copy.organizer.boothLinksHint}>
+    <OrganizerShell
+      secret={secret}
+      active="booths"
+      title={copy.organizer.boothLinks}
+      hint={copy.organizer.boothLinksHint}
+      action={
+        <Button href={`/organizer/${secret}/booth/cetak`} variant="ghost" sm>
+          <IconQr size={20} />
+          {copy.organizer.printQr}
+        </Button>
+      }
+    >
       <Card className="overflow-x-auto">
         <table className="w-full text-left text-small">
           <thead className="bg-cream font-display text-body font-semibold text-ink">
@@ -25,6 +39,7 @@ export default async function OrganizerBoothLinksPage({ params }: PageProps<"/or
               <th className="px-4 py-2.5">{copy.organizer.boothCode}</th>
               <th className="px-4 py-2.5">{copy.organizer.tenantCol}</th>
               <th className="px-4 py-2.5">{copy.organizer.linkCol}</th>
+              <th className="px-4 py-2.5">{copy.organizer.qr}</th>
             </tr>
           </thead>
           <tbody className="divide-y-2 divide-line">
@@ -38,6 +53,9 @@ export default async function OrganizerBoothLinksPage({ params }: PageProps<"/or
                     <a href={href} className="break-all font-mono text-navy underline">
                       {href}
                     </a>
+                  </td>
+                  <td className="px-4 py-2">
+                    <Eyebrow href={`/organizer/${secret}/booth/cetak?booth=${b.code}`}>{copy.organizer.qr}</Eyebrow>
                   </td>
                 </tr>
               );
